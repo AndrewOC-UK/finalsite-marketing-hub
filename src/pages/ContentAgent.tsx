@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -206,7 +205,7 @@ const ContentAgent = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-          <MessageSquare className="h-8 w-8 text-[#0072b8]" />
+          <MessageSquare className="h-8 w-8 text-black" />
           Content Agent
         </h1>
         <p className="text-gray-600 mt-2">
@@ -218,7 +217,7 @@ const ContentAgent = () => {
       <Card className="border border-gray-200 shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <SettingsIcon className="h-5 w-5 text-[#0072b8]" />
+            <SettingsIcon className="h-5 w-5 text-black" />
             Agent Configuration
           </CardTitle>
           <CardDescription>
@@ -296,7 +295,7 @@ const ContentAgent = () => {
             <Button 
               onClick={saveSettings} 
               disabled={loading}
-              className="bg-[#0072b8] hover:bg-[#005a94]"
+              className="bg-black text-accent hover:bg-black/90"
             >
               {loading ? 'Saving...' : 'Save Settings'}
             </Button>
@@ -304,7 +303,7 @@ const ContentAgent = () => {
               onClick={generateContent} 
               disabled={generating}
               variant="outline"
-              className="border-[#0072b8] text-[#0072b8] hover:bg-[#0072b8] hover:text-white"
+              className="border-black text-black hover:bg-black hover:text-accent"
             >
               <Play className="h-4 w-4 mr-2" />
               {generating ? 'Generating...' : 'Generate Now'}
@@ -317,7 +316,7 @@ const ContentAgent = () => {
       <Card className="border border-gray-200 shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <History className="h-5 w-5 text-[#0072b8]" />
+            <History className="h-5 w-5 text-black" />
             Content History
           </CardTitle>
           <CardDescription>
@@ -353,7 +352,7 @@ const ContentAgent = () => {
                       <Button
                         size="sm"
                         onClick={() => updatePostStatus(post.id, 'posted')}
-                        className="bg-[#0072b8] hover:bg-[#005a94]"
+                        className="bg-black text-accent hover:bg-black/90"
                       >
                         Mark as Posted
                       </Button>

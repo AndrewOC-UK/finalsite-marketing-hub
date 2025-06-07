@@ -10,7 +10,7 @@ import {
   LogOut
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import FinalsiteLogo from '@/components/FinalsiteLogo'
+import UbiQEducationLogo from '@/components/UbiQEducationLogo'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from '@/hooks/use-toast'
 
@@ -48,12 +48,12 @@ const Layout = () => {
         <div className="flex flex-col h-full">
           {/* Logo and Toggle */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            {sidebarOpen && <FinalsiteLogo className="h-8" />}
+            {sidebarOpen && <UbiQEducationLogo className="h-8 text-black" />}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="text-gray-500 hover:text-[#0072b8]"
+              className="text-gray-500 hover:text-black"
             >
               {sidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </Button>
@@ -70,8 +70,8 @@ const Layout = () => {
                       variant={isActive ? "default" : "ghost"}
                       className={`w-full justify-start ${
                         isActive 
-                          ? 'bg-[#0072b8] text-white hover:bg-[#005a94]' 
-                          : 'text-gray-600 hover:text-[#0072b8] hover:bg-gray-100'
+                          ? 'bg-black text-accent hover:bg-black/90' 
+                          : 'text-gray-600 hover:text-black hover:bg-gray-100'
                       }`}
                       onClick={() => navigate(item.href)}
                     >

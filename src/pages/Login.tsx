@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import FinalsiteLogo from '@/components/FinalsiteLogo'
+import UbiQEducationLogo from '@/components/UbiQEducationLogo'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from '@/hooks/use-toast'
 
@@ -54,15 +54,15 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0072b8] to-[#005a94] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-black to-gray-800 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
-            <FinalsiteLogo className="h-12" />
+            <UbiQEducationLogo className="h-12 text-black" />
           </div>
           <div>
             <CardTitle className="text-2xl font-bold text-gray-900">
-              Marketing Agents Portal
+              UbiQ Education Marketing Hub
             </CardTitle>
             <CardDescription className="text-gray-600">
               {isSignUp ? 'Create your account' : 'Sign in to your account'}
@@ -95,7 +95,7 @@ const Login = () => {
             </div>
             <Button
               type="submit"
-              className="w-full bg-[#0072b8] hover:bg-[#005a94]"
+              className="w-full bg-black text-accent hover:bg-black/90"
               disabled={loading}
             >
               {loading ? 'Loading...' : (isSignUp ? 'Create Account' : 'Sign In')}
@@ -105,7 +105,7 @@ const Login = () => {
             <Button
               variant="link"
               onClick={() => setIsSignUp(!isSignUp)}
-              className="text-[#0072b8] hover:text-[#005a94]"
+              className="text-black hover:text-black/80"
             >
               {isSignUp 
                 ? 'Already have an account? Sign in' 

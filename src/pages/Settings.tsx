@@ -52,7 +52,7 @@ const Settings = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-          <SettingsIcon className="h-8 w-8 text-[#0072b8]" />
+          <SettingsIcon className="h-8 w-8 text-black" />
           Settings
         </h1>
         <p className="text-gray-600 mt-2">
@@ -64,7 +64,7 @@ const Settings = () => {
       <Card className="border border-gray-200 shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5 text-[#0072b8]" />
+            <User className="h-5 w-5 text-black" />
             Profile Information
           </CardTitle>
           <CardDescription>
@@ -92,7 +92,7 @@ const Settings = () => {
       <Card className="border border-gray-200 shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Webhook className="h-5 w-5 text-[#0072b8]" />
+            <Webhook className="h-5 w-5 text-black" />
             Webhook Configuration
           </CardTitle>
           <CardDescription>
@@ -149,15 +149,15 @@ const Settings = () => {
             <Button 
               onClick={saveWebhooks} 
               disabled={loading}
-              className="bg-[#0072b8] hover:bg-[#005a94]"
+              className="bg-black text-accent hover:bg-black/90"
             >
               {loading ? 'Saving...' : 'Save Webhook Settings'}
             </Button>
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="font-medium text-blue-900 mb-2">How to set up webhooks:</h4>
-            <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+          <div className="bg-accent/10 border border-accent/20 rounded-lg p-4">
+            <h4 className="font-medium text-black mb-2">How to set up webhooks:</h4>
+            <ol className="text-sm text-gray-800 space-y-1 list-decimal list-inside">
               <li>Create your automation workflow in n8n</li>
               <li>Add a webhook trigger node to your workflow</li>
               <li>Copy the webhook URL from n8n</li>
