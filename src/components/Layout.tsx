@@ -115,7 +115,7 @@ const Layout = () => {
           <img 
             src="/lovable-uploads/e8643f93-e236-4374-b873-aa473567bf66.png" 
             alt="UbiQ" 
-            className="h-6 w-auto"
+            className="h-10 w-auto"
           />
         </div>
         <main className="p-6">
