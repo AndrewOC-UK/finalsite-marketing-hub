@@ -58,7 +58,7 @@ const ContentAgent = () => {
       .single()
 
     if (data && !error) {
-      setSettings(data.settings_json)
+      setSettings(data.settings_json as AgentSettings)
     }
   }
 
