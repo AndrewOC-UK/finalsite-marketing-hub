@@ -51,20 +51,20 @@ const Settings = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-          <SettingsIcon className="h-8 w-8 text-black" />
+        <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+          <SettingsIcon className="h-8 w-8 text-primary" />
           Settings
         </h1>
-        <p className="text-gray-600 mt-2">
+        <p className="text-muted-foreground mt-2">
           Manage your account settings and configure external integrations
         </p>
       </div>
 
       {/* Profile Section */}
-      <Card className="border border-gray-200 shadow-sm">
+      <Card className="border border-border shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5 text-black" />
+            <User className="h-5 w-5 text-primary" />
             Profile Information
           </CardTitle>
           <CardDescription>
@@ -78,9 +78,9 @@ const Settings = () => {
               <Input 
                 value={user?.email || ''} 
                 disabled 
-                className="bg-gray-50"
+                className="bg-muted"
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Email address cannot be changed. Contact support if you need assistance.
               </p>
             </div>
@@ -89,10 +89,10 @@ const Settings = () => {
       </Card>
 
       {/* Webhook Configuration */}
-      <Card className="border border-gray-200 shadow-sm">
+      <Card className="border border-border shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Webhook className="h-5 w-5 text-black" />
+            <Webhook className="h-5 w-5 text-primary" />
             Webhook Configuration
           </CardTitle>
           <CardDescription>
@@ -109,7 +109,7 @@ const Settings = () => {
                 value={webhooks.contentGeneration}
                 onChange={(e) => setWebhooks({ ...webhooks, contentGeneration: e.target.value })}
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 This webhook will be triggered when generating new social media content
               </p>
             </div>
@@ -124,7 +124,7 @@ const Settings = () => {
                 value={webhooks.insightReport}
                 onChange={(e) => setWebhooks({ ...webhooks, insightReport: e.target.value })}
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 This webhook will be used for generating and delivering insight reports
               </p>
             </div>
@@ -139,7 +139,7 @@ const Settings = () => {
                 value={webhooks.emailOutreach}
                 onChange={(e) => setWebhooks({ ...webhooks, emailOutreach: e.target.value })}
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 This webhook will handle automated email outreach campaigns
               </p>
             </div>
@@ -149,15 +149,14 @@ const Settings = () => {
             <Button 
               onClick={saveWebhooks} 
               disabled={loading}
-              className="bg-black text-accent hover:bg-black/90"
             >
               {loading ? 'Saving...' : 'Save Webhook Settings'}
             </Button>
           </div>
 
           <div className="bg-accent/10 border border-accent/20 rounded-lg p-4">
-            <h4 className="font-medium text-black mb-2">How to set up webhooks:</h4>
-            <ol className="text-sm text-gray-800 space-y-1 list-decimal list-inside">
+            <h4 className="font-medium text-foreground mb-2">How to set up webhooks:</h4>
+            <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
               <li>Create your automation workflow in n8n</li>
               <li>Add a webhook trigger node to your workflow</li>
               <li>Copy the webhook URL from n8n</li>

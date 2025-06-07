@@ -18,18 +18,18 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Marketing Dashboard</h1>
-        <p className="text-gray-600 mt-2">
+        <h1 className="text-3xl font-bold text-foreground">Marketing Dashboard</h1>
+        <p className="text-muted-foreground mt-2">
           Welcome to your Marketing Agents Portal. Manage your automated marketing workflows below.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Quick Actions Card */}
-        <Card className="border border-gray-200 shadow-sm">
+        <Card className="border border-border shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <MessageSquare className="h-5 w-5 text-[#0072b8]" />
+              <MessageSquare className="h-5 w-5 text-primary" />
               Quick Actions
             </CardTitle>
             <CardDescription>
@@ -38,14 +38,14 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent className="space-y-3">
             <Button 
-              className="w-full bg-[#0072b8] hover:bg-[#005a94]"
+              className="w-full"
               onClick={() => navigate('/content-agent')}
             >
               Generate New Social Posts
             </Button>
             <Button 
               variant="outline" 
-              className="w-full border-[#0072b8] text-[#0072b8] hover:bg-[#0072b8] hover:text-white"
+              className="w-full"
               disabled
             >
               Start New Email Outreach
@@ -55,10 +55,10 @@ const Dashboard = () => {
         </Card>
 
         {/* Recent Activity Card */}
-        <Card className="border border-gray-200 shadow-sm">
+        <Card className="border border-border shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Activity className="h-5 w-5 text-[#0072b8]" />
+              <Activity className="h-5 w-5 text-primary" />
               Recent Activity
             </CardTitle>
             <CardDescription>
@@ -69,8 +69,8 @@ const Dashboard = () => {
             <div className="space-y-3">
               {recentActivity.map((activity, index) => (
                 <div key={index} className="flex justify-between items-start text-sm">
-                  <span className="text-gray-900 flex-1">{activity.action}</span>
-                  <span className="text-gray-500 text-xs ml-2">{activity.timestamp}</span>
+                  <span className="text-foreground flex-1">{activity.action}</span>
+                  <span className="text-muted-foreground text-xs ml-2">{activity.timestamp}</span>
                 </div>
               ))}
             </div>
@@ -78,10 +78,10 @@ const Dashboard = () => {
         </Card>
 
         {/* Performance Snapshot Card */}
-        <Card className="border border-gray-200 shadow-sm">
+        <Card className="border border-border shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
-              <TrendingUp className="h-5 w-5 text-[#0072b8]" />
+              <TrendingUp className="h-5 w-5 text-primary" />
               Performance Snapshot
             </CardTitle>
             <CardDescription>
@@ -91,21 +91,21 @@ const Dashboard = () => {
           <CardContent>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Campaign Reach This Week</span>
-                <span className="text-2xl font-bold text-[#0072b8]">12.5K</span>
+                <span className="text-sm text-muted-foreground">Campaign Reach This Week</span>
+                <span className="text-2xl font-bold text-primary">12.5K</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Engagement Rate</span>
+                <span className="text-sm text-muted-foreground">Engagement Rate</span>
                 <span className="text-lg font-semibold text-green-600">+15.3%</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Posts Generated</span>
-                <span className="text-lg font-semibold text-gray-900">24</span>
+                <span className="text-sm text-muted-foreground">Posts Generated</span>
+                <span className="text-lg font-semibold text-foreground">24</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-[#0072b8] h-2 rounded-full w-3/4"></div>
+              <div className="w-full bg-secondary rounded-full h-2">
+                <div className="bg-primary h-2 rounded-full w-3/4"></div>
               </div>
-              <p className="text-xs text-gray-500">Campaign performance vs. goals</p>
+              <p className="text-xs text-muted-foreground">Campaign performance vs. goals</p>
             </div>
           </CardContent>
         </Card>

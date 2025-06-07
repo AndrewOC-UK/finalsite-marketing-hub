@@ -51,14 +51,14 @@ const Layout = () => {
               <img 
                 src="/lovable-uploads/e8643f93-e236-4374-b873-aa473567bf66.png" 
                 alt="UbiQ" 
-                className="h-8 w-auto"
+                className="h-6 w-auto"
               />
             )}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="text-gray-500 hover:text-black"
+              className="text-gray-500 hover:text-primary hover:bg-accent"
             >
               {sidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </Button>
@@ -75,8 +75,8 @@ const Layout = () => {
                       variant={isActive ? "default" : "ghost"}
                       className={`w-full justify-start ${
                         isActive 
-                          ? '' 
-                          : 'text-gray-600 hover:text-black hover:bg-gray-100'
+                          ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
+                          : 'text-gray-600 hover:text-primary hover:bg-accent'
                       }`}
                       onClick={() => navigate(item.href)}
                     >
