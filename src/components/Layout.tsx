@@ -1,4 +1,3 @@
-
 import { useState } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { 
@@ -70,7 +69,7 @@ const Layout = () => {
                       variant={isActive ? "default" : "ghost"}
                       className={`w-full justify-start ${
                         isActive 
-                          ? 'bg-black text-accent hover:bg-black/90' 
+                          ? '' 
                           : 'text-gray-600 hover:text-black hover:bg-gray-100'
                       }`}
                       onClick={() => navigate(item.href)}

@@ -295,7 +295,6 @@ const ContentAgent = () => {
             <Button 
               onClick={saveSettings} 
               disabled={loading}
-              className="bg-black text-accent hover:bg-black/90"
             >
               {loading ? 'Saving...' : 'Save Settings'}
             </Button>
@@ -352,7 +351,6 @@ const ContentAgent = () => {
                       <Button
                         size="sm"
                         onClick={() => updatePostStatus(post.id, 'posted')}
-                        className="bg-black text-accent hover:bg-black/90"
                       >
                         Mark as Posted
                       </Button>
