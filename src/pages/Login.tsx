@@ -1,10 +1,10 @@
+
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import UbiQEducationLogo from '@/components/UbiQEducationLogo'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from '@/hooks/use-toast'
 
@@ -57,11 +57,15 @@ const Login = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
-            <UbiQEducationLogo className="h-12 text-black" />
+            <img 
+              src="/lovable-uploads/e8643f93-e236-4374-b873-aa473567bf66.png" 
+              alt="UbiQ" 
+              className="h-12 w-auto"
+            />
           </div>
           <div>
             <CardTitle className="text-2xl font-bold text-gray-900">
-              UbiQ Education Marketing Hub
+              Education Marketing Hub
             </CardTitle>
             <CardDescription className="text-gray-600">
               {isSignUp ? 'Create your account' : 'Sign in to your account'}
