@@ -9,7 +9,7 @@ import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
 import { MessageSquare, Settings as SettingsIcon, History, Play } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/integrations/supabase/client'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from '@/hooks/use-toast'
 
