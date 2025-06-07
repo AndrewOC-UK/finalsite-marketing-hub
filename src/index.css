@@ -17,7 +17,7 @@
     --popover-foreground: 0 0% 0%;
 
     --primary: 0 0% 0%;
-    --primary-foreground: 54 100% 50%;
+    --primary-foreground: 56 100% 60%;
 
     --secondary: 0 0% 96.1%;
     --secondary-foreground: 0 0% 0%;
@@ -25,7 +25,7 @@
     --muted: 0 0% 96.1%;
     --muted-foreground: 0 0% 45.1%;
 
-    --accent: 54 100% 50%;
+    --accent: 56 100% 60%;
     --accent-foreground: 0 0% 0%;
 
     --destructive: 0 84.2% 60.2%;
@@ -40,15 +40,15 @@
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 0 0% 0%;
     --sidebar-primary: 0 0% 0%;
-    --sidebar-primary-foreground: 54 100% 50%;
-    --sidebar-accent: 54 100% 50%;
+    --sidebar-primary-foreground: 56 100% 60%;
+    --sidebar-accent: 56 100% 60%;
     --sidebar-accent-foreground: 0 0% 0%;
     --sidebar-border: 0 0% 89.8%;
-    --sidebar-ring: 54 100% 50%;
+    --sidebar-ring: 56 100% 60%;
 
     /* UbiQ specific colors */
     --ubiq-black: 0 0% 0%;
-    --ubiq-yellow: 54 100% 50%;
+    --ubiq-yellow: 56 100% 60%;
   }
 
   .dark {
@@ -62,7 +62,7 @@
     --popover-foreground: 0 0% 98%;
 
     --primary: 0 0% 0%;
-    --primary-foreground: 54 100% 50%;
+    --primary-foreground: 56 100% 60%;
 
     --secondary: 0 0% 14.9%;
     --secondary-foreground: 0 0% 98%;
@@ -70,7 +70,7 @@
     --muted: 0 0% 14.9%;
     --muted-foreground: 0 0% 63.9%;
 
-    --accent: 54 100% 50%;
+    --accent: 56 100% 60%;
     --accent-foreground: 0 0% 0%;
 
     --destructive: 0 62.8% 30.6%;
@@ -78,16 +78,16 @@
 
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
-    --ring: 54 100% 50%;
+    --ring: 56 100% 60%;
     
     --sidebar-background: 0 0% 2%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 54 100% 50%;
+    --sidebar-primary: 56 100% 60%;
     --sidebar-primary-foreground: 0 0% 0%;
     --sidebar-accent: 0 0% 14.9%;
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 0 0% 14.9%;
-    --sidebar-ring: 54 100% 50%;
+    --sidebar-ring: 56 100% 60%;
   }
 }
 
