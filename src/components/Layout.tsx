@@ -1,3 +1,4 @@
+
 import { useState } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { 
@@ -9,7 +10,6 @@ import {
   LogOut
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import UbiQEducationLogo from '@/components/UbiQEducationLogo'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from '@/hooks/use-toast'
 
@@ -47,7 +47,13 @@ const Layout = () => {
         <div className="flex flex-col h-full">
           {/* Logo and Toggle */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            {sidebarOpen && <UbiQEducationLogo className="h-8 text-black" />}
+            {sidebarOpen && (
+              <img 
+                src="/lovable-uploads/e8643f93-e236-4374-b873-aa473567bf66.png" 
+                alt="UbiQ" 
+                className="h-8 w-auto"
+              />
+            )}
             <Button
               variant="ghost"
               size="sm"
@@ -104,6 +110,14 @@ const Layout = () => {
 
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
+        {/* Top bar with logo */}
+        <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-end">
+          <img 
+            src="/lovable-uploads/e8643f93-e236-4374-b873-aa473567bf66.png" 
+            alt="UbiQ" 
+            className="h-6 w-auto"
+          />
+        </div>
         <main className="p-6">
           <Outlet />
         </main>
