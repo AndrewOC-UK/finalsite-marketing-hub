@@ -12,6 +12,11 @@ import { MessageSquare, Settings as SettingsIcon, History, Play } from 'lucide-r
 import { supabase } from '@/integrations/supabase/client'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from '@/hooks/use-toast'
+import type { Database } from '@/integrations/supabase/types'
+
+// Type aliases for better type safety
+type DbSocialPost = Database['public']['Tables']['social_posts']['Row']
+type DbAgentSettings = Database['public']['Tables']['agent_settings']['Row']
 
 interface SocialPost {
   id: string
@@ -58,7 +63,9 @@ const ContentAgent = () => {
       .single()
 
     if (data && !error) {
-      setSettings(data.settings_json as AgentSettings)
+      // Safely cast the Json type to AgentSettings
+      const settingsData = data.settings_json as unknown as AgentSettings
+      setSettings(settingsData)
     }
   }
 
@@ -72,7 +79,7 @@ const ContentAgent = () => {
         .upsert({
           user_id: user.id,
           agent_name: 'Content Agent',
-          settings_json: settings,
+          settings_json: settings as any, // Cast to satisfy Json type
           updated_at: new Date().toISOString()
         })
 
@@ -103,7 +110,15 @@ const ContentAgent = () => {
       .order('created_at', { ascending: false })
 
     if (data && !error) {
-      setPosts(data)
+      // Transform database posts to match our interface
+      const transformedPosts: SocialPost[] = data.map((post: DbSocialPost) => ({
+        id: post.id,
+        content: post.content,
+        status: post.status as 'draft' | 'posted' | 'failed',
+        generation_source: post.generation_source as 'manual' | 'automated',
+        created_at: post.created_at
+      }))
+      setPosts(transformedPosts)
     }
   }
 
