@@ -12,13 +12,13 @@ const ContentAgent = () => {
   const { generating, generateContent } = useContentGeneration(settings, loadPosts)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 lg:space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-          <MessageSquare className="h-8 w-8 text-black" />
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 flex items-center gap-2">
+          <MessageSquare className="h-6 w-6 lg:h-8 lg:w-8 text-black" />
           Content Agent
         </h1>
-        <p className="text-gray-600 mt-2">
+        <p className="text-gray-600 mt-1 lg:mt-2 text-sm lg:text-base">
           Automate and manage your social media content generation with AI-powered assistance.
         </p>
       </div>

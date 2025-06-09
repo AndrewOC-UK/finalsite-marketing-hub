@@ -16,36 +16,36 @@ const Dashboard = () => {
   ]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 lg:space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Marketing Dashboard</h1>
-        <p className="text-muted-foreground mt-2">
+        <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Marketing Dashboard</h1>
+        <p className="text-muted-foreground mt-1 lg:mt-2 text-sm lg:text-base">
           Welcome to your Marketing Agents Portal. Manage your automated marketing workflows below.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
         {/* Quick Actions Card */}
         <Card className="border border-border shadow-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <MessageSquare className="h-5 w-5 text-primary" />
+          <CardHeader className="pb-3 lg:pb-6">
+            <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
+              <MessageSquare className="h-4 w-4 lg:h-5 lg:w-5 text-primary" />
               Quick Actions
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm">
               Generate content and start campaigns instantly
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-2 lg:space-y-3 pt-0">
             <Button 
-              className="w-full"
+              className="w-full text-sm lg:text-base h-9 lg:h-10"
               onClick={() => navigate('/content-agent')}
             >
               Generate New Social Posts
             </Button>
             <Button 
               variant="outline" 
-              className="w-full"
+              className="w-full text-sm lg:text-base h-9 lg:h-10"
               disabled
             >
               Start New Email Outreach
@@ -56,21 +56,21 @@ const Dashboard = () => {
 
         {/* Recent Activity Card */}
         <Card className="border border-border shadow-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Activity className="h-5 w-5 text-primary" />
+          <CardHeader className="pb-3 lg:pb-6">
+            <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
+              <Activity className="h-4 w-4 lg:h-5 lg:w-5 text-primary" />
               Recent Activity
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm">
               Your latest marketing activities
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
+          <CardContent className="pt-0">
+            <div className="space-y-2 lg:space-y-3">
               {recentActivity.map((activity, index) => (
-                <div key={index} className="flex justify-between items-start text-sm">
-                  <span className="text-foreground flex-1">{activity.action}</span>
-                  <span className="text-muted-foreground text-xs ml-2">{activity.timestamp}</span>
+                <div key={index} className="flex flex-col sm:flex-row sm:justify-between sm:items-start text-sm gap-1 sm:gap-2">
+                  <span className="text-foreground flex-1 text-sm lg:text-sm">{activity.action}</span>
+                  <span className="text-muted-foreground text-xs">{activity.timestamp}</span>
                 </div>
               ))}
             </div>
@@ -78,29 +78,29 @@ const Dashboard = () => {
         </Card>
 
         {/* Performance Snapshot Card */}
-        <Card className="border border-border shadow-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <TrendingUp className="h-5 w-5 text-primary" />
+        <Card className="border border-border shadow-sm lg:col-span-2 xl:col-span-1">
+          <CardHeader className="pb-3 lg:pb-6">
+            <CardTitle className="flex items-center gap-2 text-base lg:text-lg">
+              <TrendingUp className="h-4 w-4 lg:h-5 lg:w-5 text-primary" />
               Performance Snapshot
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm">
               Key metrics from your campaigns
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+          <CardContent className="pt-0">
+            <div className="space-y-3 lg:space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Campaign Reach This Week</span>
-                <span className="text-2xl font-bold text-primary">12.5K</span>
+                <span className="text-xl lg:text-2xl font-bold text-primary">12.5K</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Engagement Rate</span>
-                <span className="text-lg font-semibold text-green-600">+15.3%</span>
+                <span className="text-base lg:text-lg font-semibold text-green-600">+15.3%</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Posts Generated</span>
-                <span className="text-lg font-semibold text-foreground">24</span>
+                <span className="text-base lg:text-lg font-semibold text-foreground">24</span>
               </div>
               <div className="w-full bg-secondary rounded-full h-2">
                 <div className="bg-primary h-2 rounded-full w-3/4"></div>
