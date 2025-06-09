@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
-import { MessageSquare, Settings as SettingsIcon, History, Sparkles } from 'lucide-react'
+import { MessageSquare, Settings as SettingsIcon, History, Sparkles, Loader2 } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from '@/hooks/use-toast'
@@ -136,7 +136,7 @@ const ContentAgent = () => {
 
     setGenerating(true)
     try {
-      console.log('Starting AI content generation...')
+      console.log('Starting AI content generation with topics:', settings.topics)
       
       const { data, error } = await supabase.functions.invoke('generate-content', {
         body: { 
@@ -147,18 +147,19 @@ const ContentAgent = () => {
 
       if (error) {
         console.error('Supabase function error:', error)
-        throw error
+        throw new Error(error.message || 'Failed to generate content')
       }
 
       if (!data?.posts || !Array.isArray(data.posts)) {
+        console.error('Invalid response format:', data)
         throw new Error('Invalid response format from AI service')
       }
 
-      console.log('Generated posts:', data.posts)
+      console.log('AI generated posts:', data.posts)
 
       // Save the generated posts to the database
-      for (const content of data.posts) {
-        const { error: insertError } = await supabase
+      const insertPromises = data.posts.map(content => 
+        supabase
           .from('social_posts')
           .insert({
             user_id: user.id,
@@ -166,23 +167,27 @@ const ContentAgent = () => {
             status: 'draft',
             generation_source: 'manual'
           })
+      )
 
-        if (insertError) {
-          console.error('Error inserting post:', insertError)
-          throw insertError
-        }
+      const results = await Promise.all(insertPromises)
+      
+      // Check for any insertion errors
+      const errors = results.filter(result => result.error)
+      if (errors.length > 0) {
+        console.error('Database insertion errors:', errors)
+        throw new Error('Failed to save some posts to database')
       }
 
       await loadPosts()
       toast({
-        title: "AI Content Generated!",
-        description: `${data.posts.length} new posts have been created using AI and saved as drafts.`,
+        title: "🎉 AI Content Generated!",
+        description: `${data.posts.length} new social media posts have been created and saved as drafts.`,
       })
     } catch (error) {
       console.error('Content generation error:', error)
       toast({
-        title: "Generation Error",
-        description: error.message || "Failed to generate content. Please try again.",
+        title: "Generation Failed",
+        description: error.message || "Failed to generate content. Please check your topics and try again.",
         variant: "destructive",
       })
     } finally {
@@ -333,10 +338,19 @@ const ContentAgent = () => {
               onClick={generateContent} 
               disabled={generating || !settings.topics.trim()}
               variant="outline"
-              className="border-black text-black hover:bg-black hover:text-accent"
+              className="border-black text-black hover:bg-black hover:text-white"
             >
-              <Sparkles className="h-4 w-4 mr-2" />
-              {generating ? 'Generating with AI...' : 'Generate with AI'}
+              {generating ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Generating with AI...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Generate with AI
+                </>
+              )}
             </Button>
           </div>
         </CardContent>
