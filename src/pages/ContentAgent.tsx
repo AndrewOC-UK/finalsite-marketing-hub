@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -7,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
-import { MessageSquare, Settings as SettingsIcon, History, Play } from 'lucide-react'
+import { MessageSquare, Settings as SettingsIcon, History, Sparkles } from 'lucide-react'
 import { supabase } from '@/integrations/supabase/client'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from '@/hooks/use-toast'
@@ -124,17 +125,40 @@ const ContentAgent = () => {
   const generateContent = async () => {
     if (!user) return
 
+    if (!settings.topics || settings.topics.trim() === '') {
+      toast({
+        title: "Topics Required",
+        description: "Please enter topics/keywords before generating content.",
+        variant: "destructive",
+      })
+      return
+    }
+
     setGenerating(true)
     try {
-      // Simulate content generation
-      const samplePosts = [
-        "🎓 Exciting news from our school community! Our students continue to excel in both academics and extracurricular activities. #SchoolPride #Education",
-        "📚 New learning resources now available in our library! Come explore the latest books and digital tools to enhance your educational journey. #Learning #Resources",
-        "🏆 Congratulations to our debate team for their outstanding performance at the regional championship! Your hard work and dedication inspire us all. #Achievement #Debate"
-      ]
+      console.log('Starting AI content generation...')
+      
+      const { data, error } = await supabase.functions.invoke('generate-content', {
+        body: { 
+          topics: settings.topics,
+          postCount: 3
+        }
+      })
 
-      for (const content of samplePosts) {
-        const { error } = await supabase
+      if (error) {
+        console.error('Supabase function error:', error)
+        throw error
+      }
+
+      if (!data?.posts || !Array.isArray(data.posts)) {
+        throw new Error('Invalid response format from AI service')
+      }
+
+      console.log('Generated posts:', data.posts)
+
+      // Save the generated posts to the database
+      for (const content of data.posts) {
+        const { error: insertError } = await supabase
           .from('social_posts')
           .insert({
             user_id: user.id,
@@ -143,18 +167,22 @@ const ContentAgent = () => {
             generation_source: 'manual'
           })
 
-        if (error) throw error
+        if (insertError) {
+          console.error('Error inserting post:', insertError)
+          throw insertError
+        }
       }
 
       await loadPosts()
       toast({
-        title: "Content Generated",
-        description: `${samplePosts.length} new social media posts have been created and saved as drafts.`,
+        title: "AI Content Generated!",
+        description: `${data.posts.length} new posts have been created using AI and saved as drafts.`,
       })
     } catch (error) {
+      console.error('Content generation error:', error)
       toast({
         title: "Generation Error",
-        description: "Failed to generate content. Please try again.",
+        description: error.message || "Failed to generate content. Please try again.",
         variant: "destructive",
       })
     } finally {
@@ -227,14 +255,17 @@ const ContentAgent = () => {
         <CardContent className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="topics">Default Topics/Keywords</Label>
+              <Label htmlFor="topics">Topics/Keywords for AI Generation</Label>
               <Textarea
                 id="topics"
-                placeholder="Enter topics like: school events, academic achievements, community news..."
+                placeholder="Enter topics like: school events, academic achievements, community news, STEM education, student success stories..."
                 value={settings.topics}
                 onChange={(e) => setSettings({ ...settings, topics: e.target.value })}
                 className="min-h-[100px]"
               />
+              <p className="text-xs text-gray-500">
+                Be specific with your topics to get better AI-generated content
+              </p>
             </div>
             
             <div className="space-y-4">
@@ -300,12 +331,12 @@ const ContentAgent = () => {
             </Button>
             <Button 
               onClick={generateContent} 
-              disabled={generating}
+              disabled={generating || !settings.topics.trim()}
               variant="outline"
               className="border-black text-black hover:bg-black hover:text-accent"
             >
-              <Play className="h-4 w-4 mr-2" />
-              {generating ? 'Generating...' : 'Generate Now'}
+              <Sparkles className="h-4 w-4 mr-2" />
+              {generating ? 'Generating with AI...' : 'Generate with AI'}
             </Button>
           </div>
         </CardContent>
@@ -319,7 +350,7 @@ const ContentAgent = () => {
             Content History
           </CardTitle>
           <CardDescription>
-            View and manage all your generated social media content
+            View and manage all your AI-generated social media content
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -327,7 +358,7 @@ const ContentAgent = () => {
             <div className="text-center py-8">
               <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500">No content generated yet</p>
-              <p className="text-sm text-gray-400">Click "Generate Now" to create your first batch of posts</p>
+              <p className="text-sm text-gray-400">Add your topics above and click "Generate with AI" to create your first batch of posts</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -340,6 +371,8 @@ const ContentAgent = () => {
                         <span>{new Date(post.created_at).toLocaleDateString()}</span>
                         <span>•</span>
                         <span className="capitalize">{post.generation_source}</span>
+                        <span>•</span>
+                        <span className="text-blue-600">AI Generated</span>
                       </div>
                     </div>
                     <Badge variant={getStatusBadgeVariant(post.status)} className="ml-3">
