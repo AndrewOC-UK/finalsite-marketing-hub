@@ -275,7 +275,7 @@ ${formData.notifications.length > 0 ? `\n✅ Updates via ${formData.notification
               </div>
 
               <div className="space-y-3">
-                <Label>Target Channels * (Used as guidance, AI may propose adjustment)</Label>
+                <Label>Target Channels * (Your guidance, AI may propose)</Label>
                 <div className="grid grid-cols-2 gap-3">
                   {channels.map(channel => <div key={channel.id} className="flex items-center space-x-2">
                       <Checkbox id={channel.id} checked={formData.channels.includes(channel.id)} onCheckedChange={checked => handleChannelChange(channel.id, checked as boolean)} />
