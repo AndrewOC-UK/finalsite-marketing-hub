@@ -6,7 +6,8 @@ import {
   MessageSquare, 
   Settings as SettingsIcon,
   Menu,
-  LogOut
+  LogOut,
+  Sparkles
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'
@@ -41,6 +42,7 @@ const MobileLayout = () => {
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Content Agent', href: '/content-agent', icon: MessageSquare },
+    { name: 'Campaign Planner', href: '/smart-campaign-planner', icon: Sparkles },
     { name: 'Settings', href: '/settings', icon: SettingsIcon },
   ]
 

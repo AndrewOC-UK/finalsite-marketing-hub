@@ -1,7 +1,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { MessageSquare, TrendingUp, Activity } from 'lucide-react'
+import { MessageSquare, TrendingUp, Activity, Sparkles } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 const Dashboard = () => {
@@ -42,6 +42,14 @@ const Dashboard = () => {
               onClick={() => navigate('/content-agent')}
             >
               Generate New Social Posts
+            </Button>
+            <Button 
+              className="w-full text-sm lg:text-base h-9 lg:h-10"
+              onClick={() => navigate('/smart-campaign-planner')}
+              variant="outline"
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
+              Plan AI Campaign
             </Button>
             <Button 
               variant="outline" 

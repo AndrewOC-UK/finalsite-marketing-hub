@@ -7,6 +7,7 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 import Login from '@/pages/Login'
 import Dashboard from '@/pages/Dashboard'
 import ContentAgent from '@/pages/ContentAgent'
+import SmartCampaignPlanner from '@/pages/SmartCampaignPlanner'
 import Settings from '@/pages/Settings'
 import NotFound from '@/pages/NotFound'
 
@@ -22,6 +23,7 @@ function App() {
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="content-agent" element={<ContentAgent />} />
+            <Route path="smart-campaign-planner" element={<SmartCampaignPlanner />} />
             <Route path="settings" element={<Settings />} />
           </Route>
           <Route path="*" element={<NotFound />} />
