@@ -23,6 +23,7 @@ interface CampaignFormData {
   dailyIteration: boolean;
   notifications: string[];
 }
+
 const SmartCampaignPlanner = () => {
   const [formData, setFormData] = useState<CampaignFormData>({
     topic: '',
@@ -36,6 +37,7 @@ const SmartCampaignPlanner = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [campaignPlan, setCampaignPlan] = useState<string | null>(null);
+
   const handleTopicChange = (value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -85,6 +87,7 @@ const SmartCampaignPlanner = () => {
       startDate: date
     }));
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.topic || !formData.tone || formData.channels.length === 0) {
@@ -109,7 +112,8 @@ const SmartCampaignPlanner = () => {
     const campaignDescription = `Plan a ${formData.duration}-week ${formData.tone} social media campaign for "${formData.topic}" on ${formData.channels.join(', ')} with ${formData.mode} mode${formData.mode === 'autonomous' && formData.startDate ? ` starting ${format(formData.startDate, 'PPP')}` : ''}${formData.dailyIteration ? ' with daily AI iteration enabled' : ''}${formData.notifications.length > 0 ? ` and ${formData.notifications.join(' & ')} notifications` : ''}`;
     
     const requestData = {
-      chatInput: campaignDescription
+      chatInput: campaignDescription,
+      sessionId: "lovable-demo-user-001"
     };
     
     console.log('Sending campaign data to webhook:', requestData);
@@ -193,6 +197,7 @@ ${formData.notifications.length > 0 ? `\n✅ Updates via ${formData.notification
       setIsLoading(false);
     }
   };
+
   const channels = [{
     id: 'instagram',
     label: 'Instagram'
