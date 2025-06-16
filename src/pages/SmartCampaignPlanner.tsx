@@ -1,29 +1,27 @@
-import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Switch } from '@/components/ui/switch'
-import { Calendar } from '@/components/ui/calendar'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Loader2, Sparkles, CalendarIcon } from 'lucide-react'
-import { toast } from '@/hooks/use-toast'
-import { format } from 'date-fns'
-import { cn } from '@/lib/utils'
-
+import { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Loader2, Sparkles, CalendarIcon } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 interface CampaignFormData {
-  topic: string
-  duration: number
-  tone: string
-  channels: string[]
-  mode: string
-  startDate?: Date
-  dailyIteration: boolean
-  notifications: string[]
+  topic: string;
+  duration: number;
+  tone: string;
+  channels: string[];
+  mode: string;
+  startDate?: Date;
+  dailyIteration: boolean;
+  notifications: string[];
 }
-
 const SmartCampaignPlanner = () => {
   const [formData, setFormData] = useState<CampaignFormData>({
     topic: '',
@@ -34,88 +32,85 @@ const SmartCampaignPlanner = () => {
     startDate: undefined,
     dailyIteration: true,
     notifications: []
-  })
-  const [isLoading, setIsLoading] = useState(false)
-  const [campaignPlan, setCampaignPlan] = useState<string | null>(null)
-
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [campaignPlan, setCampaignPlan] = useState<string | null>(null);
   const handleTopicChange = (value: string) => {
-    setFormData(prev => ({ ...prev, topic: value }))
-  }
-
+    setFormData(prev => ({
+      ...prev,
+      topic: value
+    }));
+  };
   const handleDurationChange = (value: string) => {
-    setFormData(prev => ({ ...prev, duration: parseInt(value) }))
-  }
-
+    setFormData(prev => ({
+      ...prev,
+      duration: parseInt(value)
+    }));
+  };
   const handleToneChange = (value: string) => {
-    setFormData(prev => ({ ...prev, tone: value }))
-  }
-
+    setFormData(prev => ({
+      ...prev,
+      tone: value
+    }));
+  };
   const handleModeChange = (value: string) => {
-    setFormData(prev => ({ 
-      ...prev, 
+    setFormData(prev => ({
+      ...prev,
       mode: value,
       dailyIteration: value === 'autonomous' ? true : prev.dailyIteration
-    }))
-  }
-
+    }));
+  };
   const handleChannelChange = (channel: string, checked: boolean) => {
     setFormData(prev => ({
       ...prev,
-      channels: checked 
-        ? [...prev.channels, channel]
-        : prev.channels.filter(c => c !== channel)
-    }))
-  }
-
+      channels: checked ? [...prev.channels, channel] : prev.channels.filter(c => c !== channel)
+    }));
+  };
   const handleNotificationChange = (method: string, checked: boolean) => {
     setFormData(prev => ({
       ...prev,
-      notifications: checked 
-        ? [...prev.notifications, method]
-        : prev.notifications.filter(n => n !== method)
-    }))
-  }
-
+      notifications: checked ? [...prev.notifications, method] : prev.notifications.filter(n => n !== method)
+    }));
+  };
   const handleDailyIterationChange = (checked: boolean) => {
-    setFormData(prev => ({ ...prev, dailyIteration: checked }))
-  }
-
+    setFormData(prev => ({
+      ...prev,
+      dailyIteration: checked
+    }));
+  };
   const handleStartDateChange = (date: Date | undefined) => {
-    setFormData(prev => ({ ...prev, startDate: date }))
-  }
-
+    setFormData(prev => ({
+      ...prev,
+      startDate: date
+    }));
+  };
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
+    e.preventDefault();
     if (!formData.topic || !formData.tone || formData.channels.length === 0) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields and select at least one channel.",
-        variant: "destructive",
-      })
-      return
+        variant: "destructive"
+      });
+      return;
     }
-
     if (formData.mode === 'autonomous' && !formData.startDate) {
       toast({
         title: "Missing Start Date",
         description: "Start date is required for autonomous campaigns.",
-        variant: "destructive",
-      })
-      return
+        variant: "destructive"
+      });
+      return;
     }
-
-    setIsLoading(true)
-    console.log('Sending campaign data to webhook:', formData)
-
+    setIsLoading(true);
+    console.log('Sending campaign data to webhook:', formData);
     try {
       // Updated webhook URL
-      const webhookUrl = 'https://your-n8n-instance.com/webhook/school-ai-campaign'
-      
+      const webhookUrl = 'https://your-n8n-instance.com/webhook/school-ai-campaign';
       const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         mode: 'no-cors',
         body: JSON.stringify({
@@ -123,8 +118,8 @@ const SmartCampaignPlanner = () => {
           startDate: formData.startDate?.toISOString(),
           timestamp: new Date().toISOString(),
           source: 'smart-campaign-planner'
-        }),
-      })
+        })
+      });
 
       // Mock campaign plan for now
       const mockPlan = `
@@ -141,9 +136,7 @@ ${formData.startDate ? `📆 Start Date: ${format(formData.startDate, 'PPP')}` :
 ## 🧠 AI Agent Strategy Overview
 
 **Week 1: Foundation & Launch**
-${formData.mode === 'autonomous' ? 
-'• AI will autonomously post daily content based on engagement metrics' : 
-'• AI will generate daily content drafts for your approval'}
+${formData.mode === 'autonomous' ? '• AI will autonomously post daily content based on engagement metrics' : '• AI will generate daily content drafts for your approval'}
 • Initial awareness posts with ${formData.tone.toLowerCase()} tone
 • Community engagement monitoring
 • Baseline metrics establishment
@@ -171,9 +164,7 @@ ${formData.duration > 3 ? `
 ` : ''}
 
 ## 📊 AI Automation Features
-${formData.mode === 'autonomous' ? 
-'✅ Autonomous daily posting\n✅ Real-time engagement optimization\n✅ Automatic content adaptation' : 
-'✅ Daily content generation\n✅ Performance insights\n✅ Manual approval workflow'}
+${formData.mode === 'autonomous' ? '✅ Autonomous daily posting\n✅ Real-time engagement optimization\n✅ Automatic content adaptation' : '✅ Daily content generation\n✅ Performance insights\n✅ Manual approval workflow'}
 ${formData.dailyIteration ? '\n✅ AI learning from engagement data' : ''}
 ${formData.notifications.length > 0 ? `\n✅ Updates via ${formData.notifications.join(' & ')}` : ''}
 
@@ -182,42 +173,50 @@ ${formData.notifications.length > 0 ? `\n✅ Updates via ${formData.notification
 • Consistent brand messaging across channels
 • ${formData.mode === 'autonomous' ? 'Autonomous campaign execution' : 'Streamlined content approval process'}
 • Data-driven content optimization
-      `
-
-      setCampaignPlan(mockPlan)
-      
+      `;
+      setCampaignPlan(mockPlan);
       toast({
         title: "Campaign Strategy Generated! 🚀",
-        description: "Your AI-powered campaign strategy is ready for deployment.",
-      })
+        description: "Your AI-powered campaign strategy is ready for deployment."
+      });
     } catch (error) {
-      console.error('Error generating campaign:', error)
+      console.error('Error generating campaign:', error);
       toast({
         title: "Generation Failed",
         description: "Unable to generate campaign strategy. Please try again.",
-        variant: "destructive",
-      })
+        variant: "destructive"
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
-
-  const channels = [
-    { id: 'instagram', label: 'Instagram' },
-    { id: 'facebook', label: 'Facebook' },
-    { id: 'email', label: 'Email' },
-    { id: 'twitter', label: 'Twitter' },
-    { id: 'website', label: 'Website' }
-  ]
-
-  const notifications = [
-    { id: 'email', label: 'Email' },
-    { id: 'slack', label: 'Slack' },
-    { id: 'none', label: 'None' }
-  ]
-
-  return (
-    <div className="space-y-4 lg:space-y-6">
+  };
+  const channels = [{
+    id: 'instagram',
+    label: 'Instagram'
+  }, {
+    id: 'facebook',
+    label: 'Facebook'
+  }, {
+    id: 'email',
+    label: 'Email'
+  }, {
+    id: 'twitter',
+    label: 'Twitter'
+  }, {
+    id: 'website',
+    label: 'Website'
+  }];
+  const notifications = [{
+    id: 'email',
+    label: 'Email'
+  }, {
+    id: 'slack',
+    label: 'Slack'
+  }, {
+    id: 'none',
+    label: 'None'
+  }];
+  return <div className="space-y-4 lg:space-y-6">
       <div>
         <h1 className="text-2xl lg:text-3xl font-bold text-foreground flex items-center gap-2">
           <Sparkles className="h-6 w-6 lg:h-8 lg:w-8 text-primary" />
@@ -241,13 +240,7 @@ ${formData.notifications.length > 0 ? `\n✅ Updates via ${formData.notification
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="topic">Campaign Topic *</Label>
-                <Input
-                  id="topic"
-                  placeholder="e.g., Student Wellbeing Week, Spring Sports Events"
-                  value={formData.topic}
-                  onChange={(e) => handleTopicChange(e.target.value)}
-                  className="text-sm lg:text-base"
-                />
+                <Input id="topic" placeholder="e.g., Student Wellbeing Week, Spring Sports Events" value={formData.topic} onChange={e => handleTopicChange(e.target.value)} className="text-sm lg:text-base" />
               </div>
 
               <div className="space-y-2">
@@ -282,25 +275,14 @@ ${formData.notifications.length > 0 ? `\n✅ Updates via ${formData.notification
               </div>
 
               <div className="space-y-3">
-                <Label>Target Channels * (Select at least one)</Label>
+                <Label>Target Channels * (Used as guidance, AI may propose adjustment)</Label>
                 <div className="grid grid-cols-2 gap-3">
-                  {channels.map((channel) => (
-                    <div key={channel.id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={channel.id}
-                        checked={formData.channels.includes(channel.id)}
-                        onCheckedChange={(checked) => 
-                          handleChannelChange(channel.id, checked as boolean)
-                        }
-                      />
-                      <Label 
-                        htmlFor={channel.id} 
-                        className="text-sm font-normal cursor-pointer"
-                      >
+                  {channels.map(channel => <div key={channel.id} className="flex items-center space-x-2">
+                      <Checkbox id={channel.id} checked={formData.channels.includes(channel.id)} onCheckedChange={checked => handleChannelChange(channel.id, checked as boolean)} />
+                      <Label htmlFor={channel.id} className="text-sm font-normal cursor-pointer">
                         {channel.label}
                       </Label>
-                    </div>
-                  ))}
+                    </div>)}
                 </div>
               </div>
 
@@ -317,87 +299,47 @@ ${formData.notifications.length > 0 ? `\n✅ Updates via ${formData.notification
                 </Select>
               </div>
 
-              {formData.mode === 'autonomous' && (
-                <div className="space-y-2">
+              {formData.mode === 'autonomous' && <div className="space-y-2">
                   <Label>Start Date *</Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !formData.startDate && "text-muted-foreground"
-                        )}
-                      >
+                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !formData.startDate && "text-muted-foreground")}>
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {formData.startDate ? format(formData.startDate, "PPP") : "Pick a date"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={formData.startDate}
-                        onSelect={handleStartDateChange}
-                        disabled={(date) => date < new Date()}
-                        initialFocus
-                        className="pointer-events-auto"
-                      />
+                      <Calendar mode="single" selected={formData.startDate} onSelect={handleStartDateChange} disabled={date => date < new Date()} initialFocus className="pointer-events-auto" />
                     </PopoverContent>
                   </Popover>
-                </div>
-              )}
+                </div>}
 
-              {formData.mode === 'autonomous' && (
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="dailyIteration"
-                    checked={formData.dailyIteration}
-                    onCheckedChange={handleDailyIterationChange}
-                  />
+              {formData.mode === 'autonomous' && <div className="flex items-center space-x-2">
+                  <Switch id="dailyIteration" checked={formData.dailyIteration} onCheckedChange={handleDailyIterationChange} />
                   <Label htmlFor="dailyIteration" className="text-sm font-normal">
                     Let AI adjust post style based on engagement data?
                   </Label>
-                </div>
-              )}
+                </div>}
 
               <div className="space-y-3">
                 <Label>Notification Method</Label>
                 <div className="grid grid-cols-2 gap-3">
-                  {notifications.map((notification) => (
-                    <div key={notification.id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={notification.id}
-                        checked={formData.notifications.includes(notification.id)}
-                        onCheckedChange={(checked) => 
-                          handleNotificationChange(notification.id, checked as boolean)
-                        }
-                      />
-                      <Label 
-                        htmlFor={notification.id} 
-                        className="text-sm font-normal cursor-pointer"
-                      >
+                  {notifications.map(notification => <div key={notification.id} className="flex items-center space-x-2">
+                      <Checkbox id={notification.id} checked={formData.notifications.includes(notification.id)} onCheckedChange={checked => handleNotificationChange(notification.id, checked as boolean)} />
+                      <Label htmlFor={notification.id} className="text-sm font-normal cursor-pointer">
                         {notification.label}
                       </Label>
-                    </div>
-                  ))}
+                    </div>)}
                 </div>
               </div>
 
-              <Button 
-                type="submit" 
-                className="w-full bg-[hsl(var(--ubiq-yellow))] hover:bg-[hsl(var(--ubiq-yellow))]/90 text-black font-semibold" 
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
+              <Button type="submit" className="w-full bg-[hsl(var(--ubiq-yellow))] hover:bg-[hsl(var(--ubiq-yellow))]/90 text-black font-semibold" disabled={isLoading}>
+                {isLoading ? <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Launching Campaign Strategy...
-                  </>
-                ) : (
-                  <>
+                  </> : <>
                     🤖 <Sparkles className="mr-1 h-4 w-4" /> Launch Campaign Strategy ✨
-                  </>
-                )}
+                  </>}
               </Button>
             </form>
           </CardContent>
@@ -448,14 +390,12 @@ ${formData.notifications.length > 0 ? `\n✅ Updates via ${formData.notification
                 </span>
               </div>
               
-              {formData.mode === 'autonomous' && formData.startDate && (
-                <div>
+              {formData.mode === 'autonomous' && formData.startDate && <div>
                   <span className="font-medium text-foreground">Start Date:</span>{' '}
                   <span className="text-muted-foreground">
                     {format(formData.startDate, 'PPP')}
                   </span>
-                </div>
-              )}
+                </div>}
 
               <div className="border-t pt-4 mt-4">
                 <p className="font-medium text-foreground mb-2">AI will:</p>
@@ -470,20 +410,16 @@ ${formData.notifications.length > 0 ? `\n✅ Updates via ${formData.notification
                       {formData.mode === 'autonomous' ? 'Schedule and send posts automatically' : 'Create drafts for your approval'}
                     </span>
                   </div>
-                  {formData.dailyIteration && formData.mode === 'autonomous' && (
-                    <div className="flex items-center gap-2">
+                  {formData.dailyIteration && formData.mode === 'autonomous' && <div className="flex items-center gap-2">
                       <span className="text-green-500">✓</span>
                       <span className="text-muted-foreground text-xs">Adapt based on engagement</span>
-                    </div>
-                  )}
-                  {formData.notifications.length > 0 && (
-                    <div className="flex items-center gap-2">
+                    </div>}
+                  {formData.notifications.length > 0 && <div className="flex items-center gap-2">
                       <span className="text-green-500">✓</span>
                       <span className="text-muted-foreground text-xs">
                         Send updates via {formData.notifications.join(' & ')}
                       </span>
-                    </div>
-                  )}
+                    </div>}
                 </div>
               </div>
             </div>
@@ -492,8 +428,7 @@ ${formData.notifications.length > 0 ? `\n✅ Updates via ${formData.notification
       </div>
 
       {/* Campaign Plan Results */}
-      {campaignPlan && (
-        <Card className="border border-border shadow-sm">
+      {campaignPlan && <Card className="border border-border shadow-sm">
           <CardHeader className="pb-3 lg:pb-6">
             <CardTitle className="text-base lg:text-lg">AI Campaign Strategy</CardTitle>
             <CardDescription className="text-sm">
@@ -507,10 +442,7 @@ ${formData.notifications.length > 0 ? `\n✅ Updates via ${formData.notification
               </pre>
             </div>
           </CardContent>
-        </Card>
-      )}
-    </div>
-  )
-}
-
-export default SmartCampaignPlanner
+        </Card>}
+    </div>;
+};
+export default SmartCampaignPlanner;
