@@ -113,7 +113,11 @@ const SmartCampaignPlanner = () => {
     
     const requestData = {
       chatInput: campaignDescription,
-      sessionId: "lovable-demo-user-001"
+      sessionId: "lovable-demo-user-001",
+      campaignTopic: formData.topic,
+      durationWeeks: formData.duration.toString(),
+      preferredTone: formData.tone,
+      targetChannels: formData.channels
     };
     
     console.log('Sending campaign data to webhook:', requestData);
