@@ -104,7 +104,15 @@ const SmartCampaignPlanner = () => {
       return;
     }
     setIsLoading(true);
-    console.log('Sending campaign data to webhook:', formData);
+    
+    // Format the campaign details into a descriptive string
+    const campaignDescription = `Plan a ${formData.duration}-week ${formData.tone} social media campaign for "${formData.topic}" on ${formData.channels.join(', ')} with ${formData.mode} mode${formData.mode === 'autonomous' && formData.startDate ? ` starting ${format(formData.startDate, 'PPP')}` : ''}${formData.dailyIteration ? ' with daily AI iteration enabled' : ''}${formData.notifications.length > 0 ? ` and ${formData.notifications.join(' & ')} notifications` : ''}`;
+    
+    const requestData = {
+      chatInput: campaignDescription
+    };
+    
+    console.log('Sending campaign data to webhook:', requestData);
     try {
       const webhookUrl = 'https://andrewoconnor.app.n8n.cloud/webhook/generate-campaign-plan';
       const response = await fetch(webhookUrl, {
@@ -113,12 +121,7 @@ const SmartCampaignPlanner = () => {
           'Content-Type': 'application/json'
         },
         mode: 'no-cors',
-        body: JSON.stringify({
-          ...formData,
-          startDate: formData.startDate?.toISOString(),
-          timestamp: new Date().toISOString(),
-          source: 'smart-campaign-planner'
-        })
+        body: JSON.stringify(requestData)
       });
 
       // Mock campaign plan for now
