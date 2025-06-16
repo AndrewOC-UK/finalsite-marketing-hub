@@ -1,4 +1,3 @@
-
 import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -386,7 +385,7 @@ ${formData.notifications.length > 0 ? `\n✅ Updates via ${formData.notification
 
               <Button 
                 type="submit" 
-                className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold" 
+                className="w-full bg-[hsl(var(--ubiq-yellow))] hover:bg-[hsl(var(--ubiq-yellow))]/90 text-black font-semibold" 
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -395,7 +394,9 @@ ${formData.notifications.length > 0 ? `\n✅ Updates via ${formData.notification
                     Launching Campaign Strategy...
                   </>
                 ) : (
-                  '🚀 Launch Campaign Strategy'
+                  <>
+                    🤖 <Sparkles className="mr-1 h-4 w-4" /> Launch Campaign Strategy ✨
+                  </>
                 )}
               </Button>
             </form>
