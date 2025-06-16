@@ -105,8 +105,7 @@ const SmartCampaignPlanner = () => {
     setIsLoading(true);
     console.log('Sending campaign data to webhook:', formData);
     try {
-      // Updated webhook URL
-      const webhookUrl = 'https://your-n8n-instance.com/webhook/school-ai-campaign';
+      const webhookUrl = 'https://andrewoconnor.app.n8n.cloud/webhook/generate-campaign-plan';
       const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
