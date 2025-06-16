@@ -110,8 +110,8 @@ const SmartCampaignPlanner = () => {
     console.log('Sending campaign data to webhook:', formData)
 
     try {
-      // Placeholder webhook URL - replace with actual n8n webhook
-      const webhookUrl = 'https://your-n8n-webhook-url.com/campaign-planner'
+      // Updated webhook URL
+      const webhookUrl = 'https://your-n8n-instance.com/webhook/school-ai-campaign'
       
       const response = await fetch(webhookUrl, {
         method: 'POST',
@@ -402,34 +402,112 @@ ${formData.notifications.length > 0 ? `\n✅ Updates via ${formData.notification
           </CardContent>
         </Card>
 
-        {/* Campaign Preview */}
+        {/* Strategy Preview */}
+        <Card className="border border-border shadow-sm">
+          <CardHeader className="pb-3 lg:pb-6">
+            <CardTitle className="text-base lg:text-lg">🎯 Campaign Strategy Preview</CardTitle>
+            <CardDescription className="text-sm">
+              Live preview of your AI campaign configuration
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="space-y-4 text-sm">
+              <div>
+                <span className="font-medium text-foreground">Topic:</span>{' '}
+                <span className="text-muted-foreground">
+                  {formData.topic || 'Not specified'}
+                </span>
+              </div>
+              
+              <div>
+                <span className="font-medium text-foreground">Duration:</span>{' '}
+                <span className="text-muted-foreground">
+                  {formData.duration} week{formData.duration > 1 ? 's' : ''}
+                </span>
+              </div>
+              
+              <div>
+                <span className="font-medium text-foreground">Tone:</span>{' '}
+                <span className="text-muted-foreground">
+                  {formData.tone || 'Not selected'}
+                </span>
+              </div>
+              
+              <div>
+                <span className="font-medium text-foreground">Channels:</span>{' '}
+                <span className="text-muted-foreground">
+                  {formData.channels.length > 0 ? formData.channels.join(', ') : 'None selected'}
+                </span>
+              </div>
+              
+              <div>
+                <span className="font-medium text-foreground">Mode:</span>{' '}
+                <span className="text-muted-foreground">
+                  {formData.mode === 'autonomous' ? 'AI-Autonomous' : 'Manual Approval'}
+                </span>
+              </div>
+              
+              {formData.mode === 'autonomous' && formData.startDate && (
+                <div>
+                  <span className="font-medium text-foreground">Start Date:</span>{' '}
+                  <span className="text-muted-foreground">
+                    {format(formData.startDate, 'PPP')}
+                  </span>
+                </div>
+              )}
+
+              <div className="border-t pt-4 mt-4">
+                <p className="font-medium text-foreground mb-2">AI will:</p>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span>
+                    <span className="text-muted-foreground text-xs">Generate content</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span>
+                    <span className="text-muted-foreground text-xs">
+                      {formData.mode === 'autonomous' ? 'Schedule and send posts automatically' : 'Create drafts for your approval'}
+                    </span>
+                  </div>
+                  {formData.dailyIteration && formData.mode === 'autonomous' && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-green-500">✓</span>
+                      <span className="text-muted-foreground text-xs">Adapt based on engagement</span>
+                    </div>
+                  )}
+                  {formData.notifications.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-green-500">✓</span>
+                      <span className="text-muted-foreground text-xs">
+                        Send updates via {formData.notifications.join(' & ')}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Campaign Plan Results */}
+      {campaignPlan && (
         <Card className="border border-border shadow-sm">
           <CardHeader className="pb-3 lg:pb-6">
             <CardTitle className="text-base lg:text-lg">AI Campaign Strategy</CardTitle>
             <CardDescription className="text-sm">
-              Your AI-generated campaign strategy will appear here
+              Your generated campaign strategy
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : campaignPlan ? (
-              <div className="prose prose-sm max-w-none">
-                <pre className="whitespace-pre-wrap text-sm font-mono bg-muted p-4 rounded-md overflow-auto max-h-96">
-                  {campaignPlan}
-                </pre>
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <Sparkles className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p className="text-sm">Configure your campaign parameters and click "Launch Campaign Strategy" to see your AI-powered marketing plan.</p>
-              </div>
-            )}
+            <div className="prose prose-sm max-w-none">
+              <pre className="whitespace-pre-wrap text-sm font-mono bg-muted p-4 rounded-md overflow-auto max-h-96">
+                {campaignPlan}
+              </pre>
+            </div>
           </CardContent>
         </Card>
-      </div>
+      )}
     </div>
   )
 }
