@@ -232,9 +232,9 @@ ${formData.notifications.length > 0 ? `\n✅ Updates via ${formData.notification
         <Card className="border border-border shadow-sm">
           <CardHeader className="pb-3 lg:pb-6">
             <CardTitle className="text-base lg:text-lg">Campaign Parameters</CardTitle>
-            <CardDescription className="text-sm">
-              Configure your AI-driven marketing campaign
-            </CardDescription>
+            <CardDescription className="text-sm">Configure your AI-driven marketing campaign. AI may propose other settings for your campaign.
+
+          </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 pt-0">
             <form onSubmit={handleSubmit} className="space-y-4">
