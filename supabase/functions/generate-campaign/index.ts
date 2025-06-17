@@ -1,4 +1,5 @@
 
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -18,7 +19,7 @@ serve(async (req) => {
     
     console.log('Received campaign request:', requestData);
 
-    // Make the request to N8N webhook
+    // Make the request to N8N webhook with text/plain content-type to match working version
     const webhookUrl = 'https://andrewoconnor.app.n8n.cloud/webhook/generate-campaign-plan';
     
     console.log('Sending request to N8N webhook:', webhookUrl);
@@ -27,8 +28,7 @@ serve(async (req) => {
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'Supabase-Edge-Function'
+        'Content-Type': 'text/plain;charset=UTF-8'
       },
       body: JSON.stringify(requestData)
     });
@@ -139,3 +139,4 @@ serve(async (req) => {
     );
   }
 });
+
