@@ -199,7 +199,14 @@ const SmartCampaignPlanner = () => {
 
     return results.map((result, index) => {
       try {
+        // Log the raw result for debugging
+        console.log('Raw campaign result:', result);
+        console.log('Result output:', result.output);
+        
         const campaign: CampaignResult = JSON.parse(result.output);
+        console.log('Parsed campaign:', campaign);
+        console.log('Campaign weeks:', campaign.weeks);
+        console.log('Number of weeks:', campaign.weeks?.length);
         
         return (
           <div key={index} className="space-y-4">
@@ -211,26 +218,34 @@ const SmartCampaignPlanner = () => {
             </div>
             
             <div className="space-y-4">
-              {campaign.weeks.map((week) => (
-                <div key={week.week} className="border border-border rounded-lg p-4">
-                  <h4 className="font-semibold text-lg mb-2 text-primary">
-                    Week {week.week}: {week.theme}
-                  </h4>
-                  <div className="space-y-2">
-                    {week.contentIdeas.map((idea, ideaIndex) => (
-                      <div key={ideaIndex} className="flex items-start gap-2 text-sm">
-                        <span className="text-muted-foreground mt-1">•</span>
-                        <span className="text-foreground">{idea}</span>
+              {campaign.weeks && campaign.weeks.length > 0 ? (
+                campaign.weeks.map((week) => {
+                  console.log('Rendering week:', week);
+                  return (
+                    <div key={week.week} className="border border-border rounded-lg p-4">
+                      <h4 className="font-semibold text-lg mb-2 text-primary">
+                        Week {week.week}: {week.theme}
+                      </h4>
+                      <div className="space-y-2">
+                        {week.contentIdeas && week.contentIdeas.map((idea, ideaIndex) => (
+                          <div key={ideaIndex} className="flex items-start gap-2 text-sm">
+                            <span className="text-muted-foreground mt-1">•</span>
+                            <span className="text-foreground">{idea}</span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="text-red-500">No weeks data found in campaign results</div>
+              )}
             </div>
           </div>
         );
       } catch (error) {
         console.error('Error parsing campaign result:', error);
+        console.error('Raw result that failed to parse:', result);
         return (
           <div key={index} className="bg-red-50 border border-red-200 p-3 rounded text-sm text-red-700">
             <strong>Error parsing campaign result:</strong> {result.output}
