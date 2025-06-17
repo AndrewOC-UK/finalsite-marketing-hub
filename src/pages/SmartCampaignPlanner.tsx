@@ -142,32 +142,20 @@ const SmartCampaignPlanner = () => {
         headers: {
           'Content-Type': 'application/json'
         },
+        mode: 'no-cors', // Restore no-cors mode for N8N compatibility
         body: JSON.stringify(requestData)
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const responseData = await response.json();
-      console.log('N8N webhook response:', responseData);
-
-      // Handle the response data - it could be a single campaign or an array
-      let campaigns = [];
-      if (Array.isArray(responseData)) {
-        campaigns = responseData;
-      } else if (responseData.campaignTitle && responseData.weeks) {
-        campaigns = [responseData];
-      } else {
-        throw new Error('Invalid response format from N8N');
-      }
-
-      setCampaignResults(campaigns);
-
+      // Since we're using no-cors, we can't access the response
+      // We'll need to handle this differently or wait for the webhook to return data
+      console.log('Request sent to N8N webhook');
+      
+      // For now, show success message since we can't read the response with no-cors
       toast({
-        title: "Campaign Generated! 🚀",
-        description: "Your AI campaign plan has been successfully created."
+        title: "Campaign Request Sent! 🚀",
+        description: "Your campaign is being generated. Please check back shortly for results."
       });
+
     } catch (error) {
       console.error('Error sending campaign request:', error);
       toast({
