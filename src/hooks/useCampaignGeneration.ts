@@ -15,17 +15,12 @@ export const useCampaignGeneration = () => {
       const webhookSettings = localStorage.getItem('webhookSettings');
       let webhookUrl = '';
       
-      console.log('Raw webhook settings from localStorage:', webhookSettings);
-      
       if (webhookSettings) {
         const settings = JSON.parse(webhookSettings);
         webhookUrl = settings.campaignPlanner;
-        console.log('Parsed webhook URL:', webhookUrl);
-        console.log('Full settings object:', settings);
       }
       
       if (!webhookUrl) {
-        console.error('No webhook URL found in settings');
         toast({
           title: "Webhook Not Configured",
           description: "Please configure the Campaign Planner webhook in Settings before generating campaigns.",
@@ -54,33 +49,12 @@ export const useCampaignGeneration = () => {
         }),
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-
       if (!response.ok) {
-        console.error(`HTTP error! status: ${response.status}`);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Get response as text first to debug
-      const responseText = await response.text();
-      console.log('Raw response text:', responseText);
-      console.log('Response text length:', responseText.length);
-
-      if (!responseText || responseText.trim() === '') {
-        console.error('Empty response from webhook');
-        throw new Error('Empty response from webhook');
-      }
-
-      let webhookResult: WebhookCampaignResult;
-      try {
-        webhookResult = JSON.parse(responseText);
-        console.log('Parsed webhook response:', webhookResult);
-      } catch (parseError) {
-        console.error('Failed to parse webhook response as JSON:', parseError);
-        console.error('Raw response that failed to parse:', responseText);
-        throw new Error('Invalid JSON response from webhook');
-      }
+      const webhookResult: WebhookCampaignResult = await response.json();
+      console.log('Webhook response:', webhookResult);
 
       // Parse the weeks string from the webhook response
       let parsedWeeks;
