@@ -36,7 +36,7 @@ const SmartCampaignPlanner = () => {
     notifications: []
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [campaignPlan, setCampaignPlan] = useState<string | null>(null);
+  const [webhookResponse, setWebhookResponse] = useState<any>(null);
 
   const handleTopicChange = (value: string) => {
     setFormData(prev => ({
@@ -107,6 +107,7 @@ const SmartCampaignPlanner = () => {
       return;
     }
     setIsLoading(true);
+    setWebhookResponse(null);
     
     // Format the campaign details into a descriptive string
     const campaignDescription = `Plan a ${formData.duration}-week ${formData.tone} social media campaign for "${formData.topic}" on ${formData.channels.join(', ')} with ${formData.mode} mode${formData.mode === 'autonomous' && formData.startDate ? ` starting ${format(formData.startDate, 'PPP')}` : ''}${formData.dailyIteration ? ' with daily AI iteration enabled' : ''}${formData.notifications.length > 0 ? ` and ${formData.notifications.join(' & ')} notifications` : ''}`;
@@ -132,69 +133,30 @@ const SmartCampaignPlanner = () => {
         body: JSON.stringify(requestData)
       });
 
-      // Mock campaign plan for now
-      const mockPlan = `
-🎯 AI Campaign Strategy: "${formData.topic}"
+      // Since we're using no-cors mode, we can't read the response
+      // But we can show a success message and indicate the webhook was called
+      setWebhookResponse({
+        status: 'sent',
+        message: 'Campaign generation request sent successfully!',
+        requestData: requestData,
+        timestamp: new Date().toISOString()
+      });
 
-📅 Duration: ${formData.duration} week${formData.duration > 1 ? 's' : ''}
-🎭 Tone: ${formData.tone}
-📱 Channels: ${formData.channels.join(', ')}
-🤖 Mode: ${formData.mode === 'autonomous' ? 'AI-Autonomous' : 'Manual Approval'}
-${formData.startDate ? `📆 Start Date: ${format(formData.startDate, 'PPP')}` : ''}
-🔄 Daily Iteration: ${formData.dailyIteration ? 'Enabled' : 'Disabled'}
-🔔 Notifications: ${formData.notifications.length > 0 ? formData.notifications.join(', ') : 'None'}
-
-## 🧠 AI Agent Strategy Overview
-
-**Week 1: Foundation & Launch**
-${formData.mode === 'autonomous' ? '• AI will autonomously post daily content based on engagement metrics' : '• AI will generate daily content drafts for your approval'}
-• Initial awareness posts with ${formData.tone.toLowerCase()} tone
-• Community engagement monitoring
-• Baseline metrics establishment
-
-${formData.duration > 1 ? `
-**Week 2: Engagement Amplification**
-• AI-driven content optimization based on Week 1 performance
-• Interactive content deployment
-• Community feedback integration
-${formData.dailyIteration ? '• Daily AI adjustments based on engagement data' : ''}
-` : ''}
-
-${formData.duration > 2 ? `
-**Week 3: Deep Engagement**
-• Advanced AI content personalization
-• Cross-channel content synchronization
-• Performance-driven content pivots
-` : ''}
-
-${formData.duration > 3 ? `
-**Week 4: Campaign Optimization**
-• AI-powered content refresh
-• Community-driven content creation
-• Final push optimization
-` : ''}
-
-## 📊 AI Automation Features
-${formData.mode === 'autonomous' ? '✅ Autonomous daily posting\n✅ Real-time engagement optimization\n✅ Automatic content adaptation' : '✅ Daily content generation\n✅ Performance insights\n✅ Manual approval workflow'}
-${formData.dailyIteration ? '\n✅ AI learning from engagement data' : ''}
-${formData.notifications.length > 0 ? `\n✅ Updates via ${formData.notifications.join(' & ')}` : ''}
-
-## 🎯 Expected Outcomes
-• Increased engagement by 25-40%
-• Consistent brand messaging across channels
-• ${formData.mode === 'autonomous' ? 'Autonomous campaign execution' : 'Streamlined content approval process'}
-• Data-driven content optimization
-      `;
-      setCampaignPlan(mockPlan);
       toast({
-        title: "Campaign Strategy Generated! 🚀",
-        description: "Your AI-powered campaign strategy is ready for deployment."
+        title: "Campaign Request Sent! 🚀",
+        description: "Your campaign generation request has been submitted to the AI system."
       });
     } catch (error) {
-      console.error('Error generating campaign:', error);
+      console.error('Error sending campaign request:', error);
+      setWebhookResponse({
+        status: 'error',
+        message: 'Failed to send campaign generation request',
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
       toast({
-        title: "Generation Failed",
-        description: "Unable to generate campaign strategy. Please try again.",
+        title: "Request Failed",
+        description: "Unable to send campaign generation request. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -357,104 +319,135 @@ ${formData.notifications.length > 0 ? `\n✅ Updates via ${formData.notification
           </CardContent>
         </Card>
 
-        {/* Strategy Preview */}
+        {/* Results Panel - Updated to show webhook response */}
         <Card className="border border-border shadow-sm">
           <CardHeader className="pb-3 lg:pb-6">
-            <CardTitle className="text-base lg:text-lg">🎯 Campaign Strategy Preview</CardTitle>
+            <CardTitle className="text-base lg:text-lg">
+              {webhookResponse ? '🚀 Campaign Request Status' : '🎯 Campaign Strategy Preview'}
+            </CardTitle>
             <CardDescription className="text-sm">
-              Live preview of your AI campaign configuration
+              {webhookResponse ? 'Results from your campaign generation request' : 'Live preview of your AI campaign configuration'}
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="space-y-4 text-sm">
-              <div>
-                <span className="font-medium text-foreground">Topic:</span>{' '}
-                <span className="text-muted-foreground">
-                  {formData.topic || 'Not specified'}
-                </span>
-              </div>
-              
-              <div>
-                <span className="font-medium text-foreground">Duration:</span>{' '}
-                <span className="text-muted-foreground">
-                  {formData.duration} week{formData.duration > 1 ? 's' : ''}
-                </span>
-              </div>
-              
-              <div>
-                <span className="font-medium text-foreground">Tone:</span>{' '}
-                <span className="text-muted-foreground">
-                  {formData.tone || 'Not selected'}
-                </span>
-              </div>
-              
-              <div>
-                <span className="font-medium text-foreground">Channels:</span>{' '}
-                <span className="text-muted-foreground">
-                  {formData.channels.length > 0 ? formData.channels.join(', ') : 'None selected'}
-                </span>
-              </div>
-              
-              <div>
-                <span className="font-medium text-foreground">Mode:</span>{' '}
-                <span className="text-muted-foreground">
-                  {formData.mode === 'autonomous' ? 'AI-Autonomous' : 'Manual Approval'}
-                </span>
-              </div>
-              
-              {formData.mode === 'autonomous' && formData.startDate && <div>
-                  <span className="font-medium text-foreground">Start Date:</span>{' '}
-                  <span className="text-muted-foreground">
-                    {format(formData.startDate, 'PPP')}
-                  </span>
-                </div>}
-
-              <div className="border-t pt-4 mt-4">
-                <p className="font-medium text-foreground mb-2">AI will:</p>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span>
-                    <span className="text-muted-foreground text-xs">Generate content</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-green-500">✓</span>
-                    <span className="text-muted-foreground text-xs">
-                      {formData.mode === 'autonomous' ? 'Schedule and send posts automatically' : 'Create drafts for your approval'}
+            {webhookResponse ? (
+              <div className="space-y-4">
+                <div className={`p-4 rounded-lg border ${
+                  webhookResponse.status === 'sent' 
+                    ? 'bg-green-50 border-green-200' 
+                    : 'bg-red-50 border-red-200'
+                }`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className={`text-sm font-medium ${
+                      webhookResponse.status === 'sent' ? 'text-green-700' : 'text-red-700'
+                    }`}>
+                      {webhookResponse.status === 'sent' ? '✅ Request Sent' : '❌ Request Failed'}
                     </span>
                   </div>
-                  {formData.dailyIteration && formData.mode === 'autonomous' && <div className="flex items-center gap-2">
+                  <p className={`text-sm ${
+                    webhookResponse.status === 'sent' ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {webhookResponse.message}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {new Date(webhookResponse.timestamp).toLocaleString()}
+                  </p>
+                </div>
+
+                {webhookResponse.requestData && (
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm">Request Details:</h4>
+                    <div className="bg-muted p-3 rounded text-xs font-mono">
+                      <div><strong>Topic:</strong> {webhookResponse.requestData.campaignTopic}</div>
+                      <div><strong>Duration:</strong> {webhookResponse.requestData.durationWeeks} weeks</div>
+                      <div><strong>Tone:</strong> {webhookResponse.requestData.preferredTone}</div>
+                      <div><strong>Channels:</strong> {webhookResponse.requestData.targetChannels.join(', ')}</div>
+                      <div className="mt-2"><strong>Description:</strong></div>
+                      <div className="text-xs text-muted-foreground whitespace-pre-wrap">{webhookResponse.requestData.chatInput}</div>
+                    </div>
+                  </div>
+                )}
+
+                {webhookResponse.error && (
+                  <div className="bg-red-50 border border-red-200 p-3 rounded text-sm text-red-700">
+                    <strong>Error:</strong> {webhookResponse.error}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-4 text-sm">
+                <div>
+                  <span className="font-medium text-foreground">Topic:</span>{' '}
+                  <span className="text-muted-foreground">
+                    {formData.topic || 'Not specified'}
+                  </span>
+                </div>
+                
+                <div>
+                  <span className="font-medium text-foreground">Duration:</span>{' '}
+                  <span className="text-muted-foreground">
+                    {formData.duration} week{formData.duration > 1 ? 's' : ''}
+                  </span>
+                </div>
+                
+                <div>
+                  <span className="font-medium text-foreground">Tone:</span>{' '}
+                  <span className="text-muted-foreground">
+                    {formData.tone || 'Not selected'}
+                  </span>
+                </div>
+                
+                <div>
+                  <span className="font-medium text-foreground">Channels:</span>{' '}
+                  <span className="text-muted-foreground">
+                    {formData.channels.length > 0 ? formData.channels.join(', ') : 'None selected'}
+                  </span>
+                </div>
+                
+                <div>
+                  <span className="font-medium text-foreground">Mode:</span>{' '}
+                  <span className="text-muted-foreground">
+                    {formData.mode === 'autonomous' ? 'AI-Autonomous' : 'Manual Approval'}
+                  </span>
+                </div>
+                
+                {formData.mode === 'autonomous' && formData.startDate && <div>
+                    <span className="font-medium text-foreground">Start Date:</span>{' '}
+                    <span className="text-muted-foreground">
+                      {format(formData.startDate, 'PPP')}
+                    </span>
+                  </div>}
+
+                <div className="border-t pt-4 mt-4">
+                  <p className="font-medium text-foreground mb-2">AI will:</p>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
                       <span className="text-green-500">✓</span>
-                      <span className="text-muted-foreground text-xs">Adapt based on engagement</span>
-                    </div>}
-                  {formData.notifications.length > 0 && <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground text-xs">Generate content</span>
+                    </div>
+                    <div className="flex items-center gap-2">
                       <span className="text-green-500">✓</span>
                       <span className="text-muted-foreground text-xs">
-                        Send updates via {formData.notifications.join(' & ')}
+                        {formData.mode === 'autonomous' ? 'Schedule and send posts automatically' : 'Create drafts for your approval'}
                       </span>
-                    </div>}
+                    </div>
+                    {formData.dailyIteration && formData.mode === 'autonomous' && <div className="flex items-center gap-2">
+                        <span className="text-green-500">✓</span>
+                        <span className="text-muted-foreground text-xs">Adapt based on engagement</span>
+                      </div>}
+                    {formData.notifications.length > 0 && <div className="flex items-center gap-2">
+                        <span className="text-green-500">✓</span>
+                        <span className="text-muted-foreground text-xs">
+                          Send updates via {formData.notifications.join(' & ')}
+                        </span>
+                      </div>}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
       </div>
-
-      {/* Campaign Plan Results */}
-      {campaignPlan && <Card className="border border-border shadow-sm">
-          <CardHeader className="pb-3 lg:pb-6">
-            <CardTitle className="text-base lg:text-lg">AI Campaign Strategy</CardTitle>
-            <CardDescription className="text-sm">
-              Your generated campaign strategy
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="prose prose-sm max-w-none">
-              <pre className="whitespace-pre-wrap text-sm font-mono bg-muted p-4 rounded-md overflow-auto max-h-96">
-                {campaignPlan}
-              </pre>
-            </div>
-          </CardContent>
-        </Card>}
     </div>;
 };
 export default SmartCampaignPlanner;
