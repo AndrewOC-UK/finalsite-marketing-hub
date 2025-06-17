@@ -34,19 +34,33 @@ export const useCampaignGeneration = () => {
     // Format the campaign details into a descriptive string
     const campaignDescription = `Plan a ${formData.duration}-week ${formData.tone} social media campaign for "${formData.topic}" on ${formData.channels.join(', ')} with ${formData.mode} mode${formData.mode === 'autonomous' && formData.startDate ? ` starting ${format(formData.startDate, 'PPP')}` : ''}${formData.dailyIteration ? ' with daily AI iteration enabled' : ''}${formData.notifications.length > 0 ? ` and ${formData.notifications.join(' & ')} notifications` : ''}`;
     
+    // Get custom webhook URL from settings
+    const savedWebhooks = localStorage.getItem('webhookSettings');
+    let customWebhookUrl = '';
+    if (savedWebhooks) {
+      try {
+        const webhookSettings = JSON.parse(savedWebhooks);
+        customWebhookUrl = webhookSettings.campaignPlanner || '';
+      } catch (error) {
+        console.error('Failed to parse webhook settings:', error);
+      }
+    }
+    
     const requestData = {
       chatInput: campaignDescription,
       sessionId: "lovable-demo-user-001",
       campaignTopic: formData.topic,
       durationWeeks: formData.duration.toString(),
       preferredTone: formData.tone,
-      targetChannels: formData.channels
+      targetChannels: formData.channels,
+      customWebhookUrl: customWebhookUrl
     };
     
     console.log('Sending campaign data to Supabase Edge Function:', requestData);
+    console.log('Using custom webhook URL:', customWebhookUrl || 'default');
     
     try {
-      // Use the Supabase Edge Function instead of direct webhook call
+      // Use the Supabase Edge Function
       const { data, error } = await supabase.functions.invoke('generate-campaign', {
         body: requestData
       });

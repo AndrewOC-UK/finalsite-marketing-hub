@@ -18,14 +18,22 @@ serve(async (req) => {
     
     console.log('Received campaign request:', requestData);
 
-    // Make the request to N8N webhook with exact headers from working version
-    const webhookUrl = 'https://andrewoconnor.app.n8n.cloud/webhook/generate-campaign-plan';
+    // Check if custom webhook URL is provided in the request
+    const customWebhookUrl = requestData.customWebhookUrl;
     
-    console.log('Sending request to N8N webhook:', webhookUrl);
+    // Use custom webhook URL if provided, otherwise use default
+    const webhookUrl = customWebhookUrl && customWebhookUrl.trim() !== '' 
+      ? customWebhookUrl 
+      : 'https://andrewoconnor.app.n8n.cloud/webhook/generate-campaign-plan';
+    
+    console.log('Using webhook URL:', webhookUrl);
     console.log('Request payload:', requestData);
 
+    // Remove the customWebhookUrl from the data we send to n8n
+    const { customWebhookUrl: _, ...dataToSend } = requestData;
+
     // Convert to string exactly as it appears in the working version
-    const bodyString = JSON.stringify(requestData);
+    const bodyString = JSON.stringify(dataToSend);
     console.log('Body string to send:', bodyString);
     console.log('Body string length:', bodyString.length);
 
@@ -53,7 +61,8 @@ serve(async (req) => {
         JSON.stringify({ 
           error: 'N8N webhook failed',
           status: response.status,
-          details: errorText
+          details: errorText,
+          webhookUrl: webhookUrl
         }),
         {
           status: 500,
@@ -72,7 +81,8 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: 'N8N returned empty response',
-          details: 'The webhook responded successfully but returned no data'
+          details: 'The webhook responded successfully but returned no data',
+          webhookUrl: webhookUrl
         }),
         {
           status: 500,
@@ -94,7 +104,8 @@ serve(async (req) => {
         JSON.stringify({ 
           error: 'Invalid JSON response from N8N',
           details: parseError.message,
-          rawResponse: responseText
+          rawResponse: responseText,
+          webhookUrl: webhookUrl
         }),
         {
           status: 500,
@@ -117,7 +128,8 @@ serve(async (req) => {
           JSON.stringify({ 
             error: 'Failed to parse campaign data',
             details: parseError.message,
-            rawWeeks: responseData.weeks
+            rawWeeks: responseData.weeks,
+            webhookUrl: webhookUrl
           }),
           {
             status: 500,

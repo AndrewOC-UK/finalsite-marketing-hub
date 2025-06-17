@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import { Settings as SettingsIcon, Webhook, User } from 'lucide-react'
+import { Settings as SettingsIcon, Webhook, User, Sparkles } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from '@/hooks/use-toast'
 
@@ -14,7 +14,8 @@ const Settings = () => {
   const [webhooks, setWebhooks] = useState({
     contentGeneration: '',
     insightReport: '',
-    emailOutreach: ''
+    emailOutreach: '',
+    campaignPlanner: ''
   })
   const [loading, setLoading] = useState(false)
 
@@ -101,6 +102,24 @@ const Settings = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="campaign-webhook" className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary" />
+                Campaign Planner Webhook
+              </Label>
+              <Input
+                id="campaign-webhook"
+                placeholder="https://your-n8n-instance.com/webhook/generate-campaign-plan"
+                value={webhooks.campaignPlanner}
+                onChange={(e) => setWebhooks({ ...webhooks, campaignPlanner: e.target.value })}
+              />
+              <p className="text-xs text-muted-foreground">
+                This webhook will be used for AI campaign generation. If left empty, the default workflow will be used.
+              </p>
+            </div>
+
+            <Separator />
+
             <div className="space-y-2">
               <Label htmlFor="content-webhook">Content Generation Webhook</Label>
               <Input
