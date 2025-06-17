@@ -149,9 +149,23 @@ const SmartCampaignPlanner = () => {
         body: JSON.stringify(requestData)
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+      
+      // Get the raw response text first
+      const responseText = await response.text();
+      console.log('Raw response text:', responseText);
+      
       if (response.ok) {
-        const responseData = await response.json();
-        console.log('Webhook response received:', responseData);
+        // Try to parse the response as JSON
+        let responseData;
+        try {
+          responseData = JSON.parse(responseText);
+          console.log('Parsed response data:', responseData);
+        } catch (parseError) {
+          console.error('JSON parse error:', parseError);
+          throw new Error(`Invalid JSON response: ${responseText.substring(0, 200)}...`);
+        }
         
         // Handle the new N8N response format
         let campaignResults = [];
@@ -175,7 +189,7 @@ const SmartCampaignPlanner = () => {
           description: "Your AI campaign plan is ready!"
         });
       } else {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        throw new Error(`HTTP ${response.status}: ${response.statusText} - ${responseText}`);
       }
     } catch (error) {
       console.error('Error calling webhook:', error);
