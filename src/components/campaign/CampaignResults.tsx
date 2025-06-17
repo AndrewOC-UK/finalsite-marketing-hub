@@ -42,19 +42,37 @@ const CampaignResults = ({ campaignResults }: CampaignResultsProps) => {
                     🟩 Week {week.week}: {week.theme}
                   </h4>
                   <div className="space-y-3">
-                    {week.contentIdeas && Object.entries(week.contentIdeas).map(([channel, ideas]) => (
-                      <div key={channel} className="space-y-2">
-                        <h5 className="font-medium text-sm text-primary capitalize">{channel}:</h5>
+                    {week.contentIdeas && (
+                      <div className="space-y-2">
+                        <h5 className="font-medium text-sm text-primary">Content Ideas:</h5>
                         <div className="ml-4 space-y-1">
-                          {Array.isArray(ideas) && ideas.map((idea, ideaIndex) => (
-                            <div key={ideaIndex} className="flex items-start gap-2 text-sm">
-                              <span className="text-muted-foreground mt-1">•</span>
-                              <span className="text-foreground">{idea}</span>
-                            </div>
-                          ))}
+                          {Array.isArray(week.contentIdeas) ? (
+                            // Handle when contentIdeas is a simple array
+                            week.contentIdeas.map((idea, ideaIndex) => (
+                              <div key={ideaIndex} className="flex items-start gap-2 text-sm">
+                                <span className="text-muted-foreground mt-1">•</span>
+                                <span className="text-foreground">{idea}</span>
+                              </div>
+                            ))
+                          ) : (
+                            // Handle when contentIdeas is an object with channels as keys
+                            Object.entries(week.contentIdeas).map(([channel, ideas]) => (
+                              <div key={channel} className="space-y-2">
+                                <h6 className="font-medium text-xs text-primary capitalize">{channel}:</h6>
+                                <div className="ml-4 space-y-1">
+                                  {Array.isArray(ideas) && ideas.map((idea, ideaIndex) => (
+                                    <div key={ideaIndex} className="flex items-start gap-2 text-sm">
+                                      <span className="text-muted-foreground mt-1">•</span>
+                                      <span className="text-foreground">{idea}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))
+                          )}
                         </div>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
               );
