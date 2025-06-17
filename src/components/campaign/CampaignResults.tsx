@@ -1,6 +1,6 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Hash } from 'lucide-react';
 import { CampaignResult } from '@/types/campaign';
 
 interface CampaignResultsProps {
@@ -13,6 +13,7 @@ const CampaignResults = ({ campaignResults }: CampaignResultsProps) => {
 
     console.log('Raw campaign result:', result);
     console.log('Campaign title:', result.campaignTitle);
+    console.log('Campaign hashtag:', result.campaignHashtag);
     console.log('Weeks data:', result.weeks);
     console.log('Is weeks an array?', Array.isArray(result.weeks));
     
@@ -23,6 +24,12 @@ const CampaignResults = ({ campaignResults }: CampaignResultsProps) => {
             <CheckCircle className="h-5 w-5 text-green-600" />
             <h3 className="font-bold text-green-800">{result.campaignTitle}</h3>
           </div>
+          {result.campaignHashtag && (
+            <div className="flex items-center gap-2 mt-2">
+              <Hash className="h-4 w-4 text-green-600" />
+              <span className="text-green-700 font-medium">{result.campaignHashtag}</span>
+            </div>
+          )}
         </div>
         
         <div className="space-y-4">

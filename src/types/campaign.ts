@@ -12,6 +12,7 @@ export interface CampaignFormData {
 
 export interface CampaignResult {
   campaignTitle: string;
+  campaignHashtag: string;
   weeks: {
     week: number;
     theme: string;
@@ -23,5 +24,6 @@ export interface CampaignResult {
 
 export interface WebhookCampaignResult {
   campaignTitle: string;
+  campaignHashtag: string;
   weeks: string;
 }
