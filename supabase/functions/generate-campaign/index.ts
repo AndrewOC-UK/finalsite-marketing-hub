@@ -1,5 +1,4 @@
 
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -19,18 +18,27 @@ serve(async (req) => {
     
     console.log('Received campaign request:', requestData);
 
-    // Make the request to N8N webhook with text/plain content-type to match working version
+    // Make the request to N8N webhook with exact headers from working version
     const webhookUrl = 'https://andrewoconnor.app.n8n.cloud/webhook/generate-campaign-plan';
     
     console.log('Sending request to N8N webhook:', webhookUrl);
     console.log('Request payload:', requestData);
 
+    // Convert to string exactly as it appears in the working version
+    const bodyString = JSON.stringify(requestData);
+    console.log('Body string to send:', bodyString);
+    console.log('Body string length:', bodyString.length);
+
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'text/plain;charset=UTF-8'
+        'Content-Type': 'text/plain;charset=UTF-8',
+        'Accept': '*/*',
+        'Accept-Encoding': 'gzip, br',
+        'Accept-Language': 'en-GB,en;q=0.9,en-US;q=0.8',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0'
       },
-      body: JSON.stringify(requestData)
+      body: bodyString
     });
 
     console.log('N8N response status:', response.status);
@@ -139,4 +147,3 @@ serve(async (req) => {
     );
   }
 });
-
