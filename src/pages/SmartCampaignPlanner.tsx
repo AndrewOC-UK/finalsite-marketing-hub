@@ -210,21 +210,23 @@ const SmartCampaignPlanner = () => {
               </div>
             </div>
             
-            {campaign.weeks.map((week) => (
-              <div key={week.week} className="border border-border rounded-lg p-4">
-                <h4 className="font-semibold text-lg mb-2 text-primary">
-                  Week {week.week}: {week.theme}
-                </h4>
-                <div className="space-y-2">
-                  {week.contentIdeas.map((idea, ideaIndex) => (
-                    <div key={ideaIndex} className="flex items-start gap-2 text-sm">
-                      <span className="text-muted-foreground mt-1">•</span>
-                      <span className="text-foreground">{idea}</span>
-                    </div>
-                  ))}
+            <div className="space-y-4">
+              {campaign.weeks.map((week) => (
+                <div key={week.week} className="border border-border rounded-lg p-4">
+                  <h4 className="font-semibold text-lg mb-2 text-primary">
+                    Week {week.week}: {week.theme}
+                  </h4>
+                  <div className="space-y-2">
+                    {week.contentIdeas.map((idea, ideaIndex) => (
+                      <div key={ideaIndex} className="flex items-start gap-2 text-sm">
+                        <span className="text-muted-foreground mt-1">•</span>
+                        <span className="text-foreground">{idea}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         );
       } catch (error) {
