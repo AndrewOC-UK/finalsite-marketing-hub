@@ -54,7 +54,7 @@ const SmartCampaignPlanner = () => {
     notifications: []
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [campaignResults, setCampaignResults] = useState<WebhookCampaignResult | null>(null);
+  const [campaignResults, setCampaignResults] = useState<CampaignResult | null>(null);
 
   const handleTopicChange = (value: string) => {
     setFormData(prev => ({
@@ -172,81 +172,56 @@ const SmartCampaignPlanner = () => {
     }
   };
 
-  const renderCampaignResults = (result: WebhookCampaignResult) => {
+  const renderCampaignResults = (result: CampaignResult) => {
     if (!result) return null;
 
-    try {
-      // Log the raw result for debugging
-      console.log('Raw campaign result:', result);
-      console.log('Campaign title:', result.campaignTitle);
-      console.log('Weeks string:', result.weeks);
-      
-      // Parse the weeks string into an array
-      const weeksArray = JSON.parse(result.weeks);
-      console.log('Parsed weeks array:', weeksArray);
-      console.log('Number of weeks:', weeksArray?.length);
-      
-      const campaign: CampaignResult = {
-        campaignTitle: result.campaignTitle,
-        weeks: weeksArray
-      };
-      
-      return (
+    console.log('Raw campaign result:', result);
+    console.log('Campaign title:', result.campaignTitle);
+    console.log('Weeks data:', result.weeks);
+    console.log('Is weeks an array?', Array.isArray(result.weeks));
+    
+    return (
+      <div className="space-y-4">
+        <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle className="h-5 w-5 text-green-600" />
+            <h3 className="font-bold text-green-800">{result.campaignTitle}</h3>
+          </div>
+        </div>
+        
         <div className="space-y-4">
-          <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle className="h-5 w-5 text-green-600" />
-              <h3 className="font-bold text-green-800">{campaign.campaignTitle}</h3>
-            </div>
-          </div>
-          
-          <div className="space-y-4">
-            {campaign.weeks && campaign.weeks.length > 0 ? (
-              campaign.weeks.map((week) => {
-                console.log('Rendering week:', week);
-                return (
-                  <div key={week.week} className="border border-border rounded-lg p-4">
-                    <h4 className="font-semibold text-lg mb-2 text-primary">
-                      Week {week.week}: {week.theme}
-                    </h4>
-                    <div className="space-y-3">
-                      {week.contentIdeas && Object.entries(week.contentIdeas).map(([channel, ideas]) => (
-                        <div key={channel} className="space-y-2">
-                          <h5 className="font-medium text-sm text-primary capitalize">{channel}:</h5>
-                          <div className="ml-4 space-y-1">
-                            {Array.isArray(ideas) && ideas.map((idea, ideaIndex) => (
-                              <div key={ideaIndex} className="flex items-start gap-2 text-sm">
-                                <span className="text-muted-foreground mt-1">•</span>
-                                <span className="text-foreground">{idea}</span>
-                              </div>
-                            ))}
-                          </div>
+          {result.weeks && Array.isArray(result.weeks) && result.weeks.length > 0 ? (
+            result.weeks.map((week) => {
+              console.log('Rendering week:', week);
+              return (
+                <div key={week.week} className="border border-border rounded-lg p-4">
+                  <h4 className="font-semibold text-lg mb-2 text-primary">
+                    Week {week.week}: {week.theme}
+                  </h4>
+                  <div className="space-y-3">
+                    {week.contentIdeas && Object.entries(week.contentIdeas).map(([channel, ideas]) => (
+                      <div key={channel} className="space-y-2">
+                        <h5 className="font-medium text-sm text-primary capitalize">{channel}:</h5>
+                        <div className="ml-4 space-y-1">
+                          {Array.isArray(ideas) && ideas.map((idea, ideaIndex) => (
+                            <div key={ideaIndex} className="flex items-start gap-2 text-sm">
+                              <span className="text-muted-foreground mt-1">•</span>
+                              <span className="text-foreground">{idea}</span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
                   </div>
-                );
-              })
-            ) : (
-              <div className="text-red-500">No weeks data found in campaign results</div>
-            )}
-          </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="text-red-500">No weeks data found in campaign results</div>
+          )}
         </div>
-      );
-    } catch (error) {
-      console.error('Error parsing campaign result:', error);
-      console.error('Raw result that failed to parse:', result);
-      return (
-        <div className="bg-red-50 border border-red-200 p-3 rounded text-sm text-red-700">
-          <strong>Error parsing campaign result:</strong>
-          <div className="mt-2">
-            <div><strong>Campaign Title:</strong> {result.campaignTitle}</div>
-            <div><strong>Weeks Data:</strong> {result.weeks}</div>
-            <div><strong>Error:</strong> {error.message}</div>
-          </div>
-        </div>
-      );
-    }
+      </div>
+    );
   };
 
   const channels = [{
