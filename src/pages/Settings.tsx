@@ -12,6 +12,7 @@ import { toast } from '@/hooks/use-toast'
 const Settings = () => {
   const { user } = useAuth()
   const [webhooks, setWebhooks] = useState({
+    campaignPlanner: '',
     contentGeneration: '',
     insightReport: '',
     emailOutreach: ''
@@ -101,6 +102,21 @@ const Settings = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="campaign-planner-webhook">Campaign Planner Webhook</Label>
+              <Input
+                id="campaign-planner-webhook"
+                placeholder="https://your-n8n-instance.com/webhook/campaign-planner"
+                value={webhooks.campaignPlanner}
+                onChange={(e) => setWebhooks({ ...webhooks, campaignPlanner: e.target.value })}
+              />
+              <p className="text-xs text-muted-foreground">
+                This webhook will be triggered when generating new AI campaign plans
+              </p>
+            </div>
+
+            <Separator />
+
             <div className="space-y-2">
               <Label htmlFor="content-webhook">Content Generation Webhook</Label>
               <Input
