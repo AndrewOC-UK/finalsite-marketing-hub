@@ -53,7 +53,7 @@ const SmartCampaignPlanner = () => {
     notifications: []
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [campaignResults, setCampaignResults] = useState<WebhookCampaignResult[]>([]);
+  const [webhookResponse, setWebhookResponse] = useState<any>(null);
 
   const handleTopicChange = (value: string) => {
     setFormData(prev => ({
@@ -124,14 +124,18 @@ const SmartCampaignPlanner = () => {
       return;
     }
     setIsLoading(true);
-    setCampaignResults([]);
+    setWebhookResponse(null);
     
     // Format the campaign details into a descriptive string
     const campaignDescription = `Plan a ${formData.duration}-week ${formData.tone} social media campaign for "${formData.topic}" on ${formData.channels.join(', ')} with ${formData.mode} mode${formData.mode === 'autonomous' && formData.startDate ? ` starting ${format(formData.startDate, 'PPP')}` : ''}${formData.dailyIteration ? ' with daily AI iteration enabled' : ''}${formData.notifications.length > 0 ? ` and ${formData.notifications.join(' & ')} notifications` : ''}`;
     
     const requestData = {
       chatInput: campaignDescription,
-      sessionId: "lovable-demo-user-001"
+      sessionId: "lovable-demo-user-001",
+      campaignTopic: formData.topic,
+      durationWeeks: formData.duration.toString(),
+      preferredTone: formData.tone,
+      targetChannels: formData.channels
     };
     
     console.log('Sending campaign data to webhook:', requestData);
@@ -145,33 +149,44 @@ const SmartCampaignPlanner = () => {
         body: JSON.stringify(requestData)
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log('Webhook response received:', responseData);
+        
+        // Handle the new N8N response format
+        let campaignResults = [];
+        if (Array.isArray(responseData) && responseData.length > 0) {
+          campaignResults = responseData;
+        } else if (responseData.campaignTitle && responseData.weeks) {
+          // Handle single object response
+          campaignResults = [responseData];
+        }
 
-      const responseData = await response.json();
-      console.log('N8N webhook response:', responseData);
+        setWebhookResponse({
+          status: 'success',
+          message: 'Campaign generated successfully!',
+          requestData: requestData,
+          campaignResults: campaignResults,
+          timestamp: new Date().toISOString()
+        });
 
-      // Handle the response data - it could be a single campaign or an array
-      let campaigns = [];
-      if (Array.isArray(responseData)) {
-        campaigns = responseData;
-      } else if (responseData.campaignTitle && responseData.weeks) {
-        campaigns = [responseData];
+        toast({
+          title: "Campaign Generated! 🎉",
+          description: "Your AI campaign plan is ready!"
+        });
       } else {
-        throw new Error('Invalid response format from N8N');
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-
-      setCampaignResults(campaigns);
-
-      toast({
-        title: "Campaign Generated! 🚀",
-        description: "Your AI campaign plan has been successfully created."
-      });
     } catch (error) {
-      console.error('Error sending campaign request:', error);
+      console.error('Error calling webhook:', error);
+      setWebhookResponse({
+        status: 'error',
+        message: 'Failed to generate campaign',
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
       toast({
-        title: "Request Failed",
+        title: "Generation Failed",
         description: "Unable to generate campaign. Please try again.",
         variant: "destructive"
       });
@@ -414,20 +429,71 @@ const SmartCampaignPlanner = () => {
           </CardContent>
         </Card>
 
-        {/* Results Panel - Updated to show campaign results */}
+        {/* Results Panel - Updated to show webhook response and campaign results */}
         <Card className="border border-border shadow-sm">
           <CardHeader className="pb-3 lg:pb-6">
             <CardTitle className="text-base lg:text-lg">
-              {campaignResults.length > 0 ? '🚀 Campaign Results' : '🎯 Campaign Strategy Preview'}
+              {webhookResponse ? '🚀 Campaign Results' : '🎯 Campaign Strategy Preview'}
             </CardTitle>
             <CardDescription className="text-sm">
-              {campaignResults.length > 0 ? 'Your AI-generated campaign plan' : 'Live preview of your AI campaign configuration'}
+              {webhookResponse ? 'Your AI-generated campaign plan' : 'Live preview of your AI campaign configuration'}
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
-            {campaignResults.length > 0 ? (
+            {webhookResponse ? (
               <div className="space-y-4">
-                {renderCampaignResults(campaignResults)}
+                {/* Campaign Results */}
+                {webhookResponse.campaignResults && (
+                  <div className="space-y-4">
+                    {renderCampaignResults(webhookResponse.campaignResults)}
+                  </div>
+                )}
+
+                {/* Request Status */}
+                <div className={`p-4 rounded-lg border ${
+                  webhookResponse.status === 'sent' 
+                    ? 'bg-green-50 border-green-200' 
+                    : 'bg-red-50 border-red-200'
+                }`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className={`text-sm font-medium ${
+                      webhookResponse.status === 'sent' ? 'text-green-700' : 'text-red-700'
+                    }`}>
+                      {webhookResponse.status === 'sent' ? '✅ Request Sent' : '❌ Request Failed'}
+                    </span>
+                  </div>
+                  <p className={`text-sm ${
+                    webhookResponse.status === 'sent' ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {webhookResponse.message}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {new Date(webhookResponse.timestamp).toLocaleString()}
+                  </p>
+                </div>
+
+                {/* Request Details - Collapsible */}
+                {webhookResponse.requestData && (
+                  <details className="space-y-2">
+                    <summary className="font-medium text-sm cursor-pointer hover:text-primary">
+                      View Request Details
+                    </summary>
+                    <div className="bg-muted p-3 rounded text-xs font-mono mt-2">
+                      <div><strong>Topic:</strong> {webhookResponse.requestData.campaignTopic}</div>
+                      <div><strong>Duration:</strong> {webhookResponse.requestData.durationWeeks} weeks</div>
+                      <div><strong>Tone:</strong> {webhookResponse.requestData.preferredTone}</div>
+                      <div><strong>Channels:</strong> {webhookResponse.requestData.targetChannels.join(', ')}</div>
+                      <div className="mt-2"><strong>Description:</strong></div>
+                      <div className="text-xs text-muted-foreground whitespace-pre-wrap">{webhookResponse.requestData.chatInput}</div>
+                    </div>
+                  </details>
+                )}
+
+                {webhookResponse.error && (
+                  <div className="bg-red-50 border border-red-200 p-3 rounded text-sm text-red-700">
+                    <strong>Error:</strong> {webhookResponse.error}
+                  </div>
+                )}
               </div>
             ) : (
               <div className="space-y-4 text-sm">
