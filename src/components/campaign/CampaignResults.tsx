@@ -24,12 +24,6 @@ const CampaignResults = ({ campaignResults }: CampaignResultsProps) => {
             <CheckCircle className="h-5 w-5 text-green-600" />
             <h3 className="font-bold text-green-800">{result.campaignTitle}</h3>
           </div>
-          {result.campaignHashtag && (
-            <div className="flex items-center gap-2 mt-2">
-              <Hash className="h-4 w-4 text-green-600" />
-              <span className="text-green-700 font-medium">{result.campaignHashtag}</span>
-            </div>
-          )}
         </div>
         
         <div className="space-y-4">
@@ -38,9 +32,15 @@ const CampaignResults = ({ campaignResults }: CampaignResultsProps) => {
               console.log('Rendering week:', week);
               return (
                 <div key={week.week} className="border border-border rounded-lg p-4">
-                  <h4 className="font-semibold text-lg mb-2 text-primary">
-                    Week {week.week}: {week.theme}
+                  <h4 className="font-semibold text-lg mb-1 text-primary">
+                    🟩 Week {week.week}: {week.theme}
                   </h4>
+                  {result.campaignHashtag && (
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-sm">🔖</span>
+                      <span className="text-primary font-medium text-sm">{result.campaignHashtag}</span>
+                    </div>
+                  )}
                   <div className="space-y-3">
                     {week.contentIdeas && Object.entries(week.contentIdeas).map(([channel, ideas]) => (
                       <div key={channel} className="space-y-2">
