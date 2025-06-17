@@ -18,30 +18,84 @@ serve(async (req) => {
     
     console.log('Received campaign request:', requestData);
 
-    // Make the request to N8N webhook with the correct format that matches working version
+    // Make the request to N8N webhook
     const webhookUrl = 'https://andrewoconnor.app.n8n.cloud/webhook/generate-campaign-plan';
     
-    console.log('Sending request data as direct stringified body to N8N:', requestData);
+    console.log('Sending request to N8N webhook:', webhookUrl);
+    console.log('Request payload:', requestData);
 
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'User-Agent': 'Supabase-Edge-Function'
       },
-      body: JSON.stringify(requestData) // Send the request data directly as stringified JSON
+      body: JSON.stringify(requestData)
     });
 
+    console.log('N8N response status:', response.status);
+    console.log('N8N response headers:', Object.fromEntries(response.headers.entries()));
+
     if (!response.ok) {
-      console.error(`N8N webhook error! status: ${response.status}`);
       const errorText = await response.text();
-      console.error('N8N error response:', errorText);
-      throw new Error(`N8N webhook error! status: ${response.status}`);
+      console.error(`N8N webhook error! status: ${response.status}`);
+      console.error('N8N error response text:', errorText);
+      
+      return new Response(
+        JSON.stringify({ 
+          error: 'N8N webhook failed',
+          status: response.status,
+          details: errorText
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
-    const responseData = await response.json();
-    console.log('Raw N8N response:', responseData);
+    // Get the response text first to check if it's empty
+    const responseText = await response.text();
+    console.log('N8N raw response text:', responseText);
+    console.log('Response text length:', responseText.length);
+
+    if (!responseText || responseText.trim() === '') {
+      console.error('N8N returned empty response');
+      return new Response(
+        JSON.stringify({ 
+          error: 'N8N returned empty response',
+          details: 'The webhook responded successfully but returned no data'
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
+    // Try to parse the JSON response
+    let responseData;
+    try {
+      responseData = JSON.parse(responseText);
+      console.log('Successfully parsed N8N response:', responseData);
+    } catch (parseError) {
+      console.error('Failed to parse N8N response as JSON:', parseError);
+      console.error('Raw response text that failed to parse:', responseText);
+      
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid JSON response from N8N',
+          details: parseError.message,
+          rawResponse: responseText
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
     
-    // Parse the stringified weeks JSON
+    // Parse the stringified weeks JSON if needed
     let parsedResponse = responseData;
     if (responseData.weeks && typeof responseData.weeks === 'string') {
       try {
