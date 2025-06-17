@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -127,18 +126,12 @@ const SmartCampaignPlanner = () => {
     setIsLoading(true);
     setCampaignResults([]);
     
-    // Send the detailed campaign parameters that N8N expects
+    // Format the campaign details into a descriptive string
+    const campaignDescription = `Plan a ${formData.duration}-week ${formData.tone} social media campaign for "${formData.topic}" on ${formData.channels.join(', ')} with ${formData.mode} mode${formData.mode === 'autonomous' && formData.startDate ? ` starting ${format(formData.startDate, 'PPP')}` : ''}${formData.dailyIteration ? ' with daily AI iteration enabled' : ''}${formData.notifications.length > 0 ? ` and ${formData.notifications.join(' & ')} notifications` : ''}`;
+    
     const requestData = {
-      sessionId: "lovable-demo-user-001",
-      campaignTopic: formData.topic,
-      durationWeeks: formData.duration,
-      preferredTone: formData.tone,
-      targetChannels: formData.channels,
-      campaignMode: formData.mode,
-      startDate: formData.startDate ? format(formData.startDate, 'yyyy-MM-dd') : null,
-      dailyIteration: formData.dailyIteration,
-      notifications: formData.notifications,
-      chatInput: `Plan a ${formData.duration}-week ${formData.tone} social media campaign for "${formData.topic}" on ${formData.channels.join(', ')} with ${formData.mode} mode${formData.mode === 'autonomous' && formData.startDate ? ` starting ${format(formData.startDate, 'PPP')}` : ''}${formData.dailyIteration ? ' with daily AI iteration enabled' : ''}${formData.notifications.length > 0 ? ` and ${formData.notifications.join(' & ')} notifications` : ''}`
+      chatInput: campaignDescription,
+      sessionId: "lovable-demo-user-001"
     };
     
     console.log('Sending campaign data to webhook:', requestData);
@@ -149,20 +142,32 @@ const SmartCampaignPlanner = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        mode: 'no-cors', // Keep no-cors mode for N8N compatibility
         body: JSON.stringify(requestData)
       });
 
-      // Since we're using no-cors, we can't access the response
-      // We'll need to handle this differently or wait for the webhook to return data
-      console.log('Request sent to N8N webhook');
-      
-      // For now, show success message since we can't read the response with no-cors
-      toast({
-        title: "Campaign Request Sent! 🚀",
-        description: "Your campaign is being generated. Please check back shortly for results."
-      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
+      const responseData = await response.json();
+      console.log('N8N webhook response:', responseData);
+
+      // Handle the response data - it could be a single campaign or an array
+      let campaigns = [];
+      if (Array.isArray(responseData)) {
+        campaigns = responseData;
+      } else if (responseData.campaignTitle && responseData.weeks) {
+        campaigns = [responseData];
+      } else {
+        throw new Error('Invalid response format from N8N');
+      }
+
+      setCampaignResults(campaigns);
+
+      toast({
+        title: "Campaign Generated! 🚀",
+        description: "Your AI campaign plan has been successfully created."
+      });
     } catch (error) {
       console.error('Error sending campaign request:', error);
       toast({
