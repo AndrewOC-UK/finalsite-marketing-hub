@@ -35,7 +35,7 @@ interface CampaignResult {
   }[];
 }
 
-// New interface for the webhook response format
+// Interface for the webhook response format
 interface WebhookCampaignResult {
   campaignTitle: string;
   weeks: string; // This is a stringified JSON array
@@ -53,7 +53,7 @@ const SmartCampaignPlanner = () => {
     notifications: []
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [webhookResponse, setWebhookResponse] = useState<any>(null);
+  const [campaignResults, setCampaignResults] = useState<WebhookCampaignResult | null>(null);
 
   const handleTopicChange = (value: string) => {
     setFormData(prev => ({
@@ -124,7 +124,7 @@ const SmartCampaignPlanner = () => {
       return;
     }
     setIsLoading(true);
-    setWebhookResponse(null);
+    setCampaignResults(null);
     
     // Format the campaign details into a descriptive string
     const campaignDescription = `Plan a ${formData.duration}-week ${formData.tone} social media campaign for "${formData.topic}" on ${formData.channels.join(', ')} with ${formData.mode} mode${formData.mode === 'autonomous' && formData.startDate ? ` starting ${format(formData.startDate, 'PPP')}` : ''}${formData.dailyIteration ? ' with daily AI iteration enabled' : ''}${formData.notifications.length > 0 ? ` and ${formData.notifications.join(' & ')} notifications` : ''}`;
@@ -146,34 +146,28 @@ const SmartCampaignPlanner = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        mode: 'no-cors',
         body: JSON.stringify(requestData)
       });
 
-      // Since we're using no-cors mode, we can't read the response
-      // But we can show a success message and indicate the webhook was called
-      setWebhookResponse({
-        status: 'sent',
-        message: 'Campaign generation request sent successfully!',
-        requestData: requestData,
-        timestamp: new Date().toISOString()
-      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const responseData = await response.json();
+      console.log('Webhook response:', responseData);
+      
+      // Set the campaign results for display
+      setCampaignResults(responseData);
 
       toast({
-        title: "Campaign Request Sent! 🚀",
-        description: "Your campaign generation request has been submitted to the AI system."
+        title: "Campaign Generated! 🚀",
+        description: "Your AI-powered campaign plan is ready!"
       });
     } catch (error) {
-      console.error('Error sending campaign request:', error);
-      setWebhookResponse({
-        status: 'error',
-        message: 'Failed to send campaign generation request',
-        error: error.message,
-        timestamp: new Date().toISOString()
-      });
+      console.error('Error calling webhook:', error);
       toast({
         title: "Request Failed",
-        description: "Unable to send campaign generation request. Please try again.",
+        description: "Unable to generate campaign. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -181,83 +175,81 @@ const SmartCampaignPlanner = () => {
     }
   };
 
-  const renderCampaignResults = (results: WebhookCampaignResult[]) => {
-    if (!results || results.length === 0) return null;
+  const renderCampaignResults = (result: WebhookCampaignResult) => {
+    if (!result) return null;
 
-    return results.map((result, index) => {
-      try {
-        // Log the raw result for debugging
-        console.log('Raw campaign result:', result);
-        console.log('Campaign title:', result.campaignTitle);
-        console.log('Weeks string:', result.weeks);
-        
-        // Parse the weeks string into an array
-        const weeksArray = JSON.parse(result.weeks);
-        console.log('Parsed weeks array:', weeksArray);
-        console.log('Number of weeks:', weeksArray?.length);
-        
-        const campaign: CampaignResult = {
-          campaignTitle: result.campaignTitle,
-          weeks: weeksArray
-        };
-        
-        return (
-          <div key={index} className="space-y-4">
-            <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-                <h3 className="font-bold text-green-800">{campaign.campaignTitle}</h3>
-              </div>
+    try {
+      // Log the raw result for debugging
+      console.log('Raw campaign result:', result);
+      console.log('Campaign title:', result.campaignTitle);
+      console.log('Weeks string:', result.weeks);
+      
+      // Parse the weeks string into an array
+      const weeksArray = JSON.parse(result.weeks);
+      console.log('Parsed weeks array:', weeksArray);
+      console.log('Number of weeks:', weeksArray?.length);
+      
+      const campaign: CampaignResult = {
+        campaignTitle: result.campaignTitle,
+        weeks: weeksArray
+      };
+      
+      return (
+        <div className="space-y-4">
+          <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              <h3 className="font-bold text-green-800">{campaign.campaignTitle}</h3>
             </div>
-            
-            <div className="space-y-4">
-              {campaign.weeks && campaign.weeks.length > 0 ? (
-                campaign.weeks.map((week) => {
-                  console.log('Rendering week:', week);
-                  return (
-                    <div key={week.week} className="border border-border rounded-lg p-4">
-                      <h4 className="font-semibold text-lg mb-2 text-primary">
-                        Week {week.week}: {week.theme}
-                      </h4>
-                      <div className="space-y-3">
-                        {week.contentIdeas && Object.entries(week.contentIdeas).map(([channel, ideas]) => (
-                          <div key={channel} className="space-y-2">
-                            <h5 className="font-medium text-sm text-primary capitalize">{channel}:</h5>
-                            <div className="ml-4 space-y-1">
-                              {Array.isArray(ideas) && ideas.map((idea, ideaIndex) => (
-                                <div key={ideaIndex} className="flex items-start gap-2 text-sm">
-                                  <span className="text-muted-foreground mt-1">•</span>
-                                  <span className="text-foreground">{idea}</span>
-                                </div>
-                              ))}
-                            </div>
+          </div>
+          
+          <div className="space-y-4">
+            {campaign.weeks && campaign.weeks.length > 0 ? (
+              campaign.weeks.map((week) => {
+                console.log('Rendering week:', week);
+                return (
+                  <div key={week.week} className="border border-border rounded-lg p-4">
+                    <h4 className="font-semibold text-lg mb-2 text-primary">
+                      Week {week.week}: {week.theme}
+                    </h4>
+                    <div className="space-y-3">
+                      {week.contentIdeas && Object.entries(week.contentIdeas).map(([channel, ideas]) => (
+                        <div key={channel} className="space-y-2">
+                          <h5 className="font-medium text-sm text-primary capitalize">{channel}:</h5>
+                          <div className="ml-4 space-y-1">
+                            {Array.isArray(ideas) && ideas.map((idea, ideaIndex) => (
+                              <div key={ideaIndex} className="flex items-start gap-2 text-sm">
+                                <span className="text-muted-foreground mt-1">•</span>
+                                <span className="text-foreground">{idea}</span>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ))}
                     </div>
-                  );
-                })
-              ) : (
-                <div className="text-red-500">No weeks data found in campaign results</div>
-              )}
-            </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="text-red-500">No weeks data found in campaign results</div>
+            )}
           </div>
-        );
-      } catch (error) {
-        console.error('Error parsing campaign result:', error);
-        console.error('Raw result that failed to parse:', result);
-        return (
-          <div key={index} className="bg-red-50 border border-red-200 p-3 rounded text-sm text-red-700">
-            <strong>Error parsing campaign result:</strong>
-            <div className="mt-2">
-              <div><strong>Campaign Title:</strong> {result.campaignTitle}</div>
-              <div><strong>Weeks Data:</strong> {result.weeks}</div>
-              <div><strong>Error:</strong> {error.message}</div>
-            </div>
+        </div>
+      );
+    } catch (error) {
+      console.error('Error parsing campaign result:', error);
+      console.error('Raw result that failed to parse:', result);
+      return (
+        <div className="bg-red-50 border border-red-200 p-3 rounded text-sm text-red-700">
+          <strong>Error parsing campaign result:</strong>
+          <div className="mt-2">
+            <div><strong>Campaign Title:</strong> {result.campaignTitle}</div>
+            <div><strong>Weeks Data:</strong> {result.weeks}</div>
+            <div><strong>Error:</strong> {error.message}</div>
           </div>
-        );
-      }
-    });
+        </div>
+      );
+    }
   };
 
   const channels = [{
@@ -302,9 +294,7 @@ const SmartCampaignPlanner = () => {
         <Card className="border border-border shadow-sm">
           <CardHeader className="pb-3 lg:pb-6">
             <CardTitle className="text-base lg:text-lg">Campaign Parameters</CardTitle>
-            <CardDescription className="text-sm">Configure your AI-driven marketing campaign. AI may propose other settings for your campaign.
-
-          </CardDescription>
+            <CardDescription className="text-sm">Configure your AI-driven marketing campaign. AI may propose other settings for your campaign.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 pt-0">
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -415,72 +405,19 @@ const SmartCampaignPlanner = () => {
           </CardContent>
         </Card>
 
-        {/* Results Panel - Updated to show webhook response and campaign results */}
+        {/* Results Panel */}
         <Card className="border border-border shadow-sm">
           <CardHeader className="pb-3 lg:pb-6">
             <CardTitle className="text-base lg:text-lg">
-              {webhookResponse ? '🚀 Campaign Results' : '🎯 Campaign Strategy Preview'}
+              {campaignResults ? '🚀 Your Campaign Plan' : '🎯 Campaign Strategy Preview'}
             </CardTitle>
             <CardDescription className="text-sm">
-              {webhookResponse ? 'Your AI-generated campaign plan' : 'Live preview of your AI campaign configuration'}
+              {campaignResults ? 'Your AI-generated campaign plan is ready!' : 'Live preview of your AI campaign configuration'}
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
-            {webhookResponse ? (
-              <div className="space-y-4">
-                {/* Campaign Results */}
-                {webhookResponse.campaignResults && (
-                  <div className="space-y-4">
-                    {renderCampaignResults(webhookResponse.campaignResults)}
-                  </div>
-                )}
-
-                {/* Request Status */}
-                <div className={`p-4 rounded-lg border ${
-                  webhookResponse.status === 'sent' 
-                    ? 'bg-green-50 border-green-200' 
-                    : 'bg-red-50 border-red-200'
-                }`}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className={`text-sm font-medium ${
-                      webhookResponse.status === 'sent' ? 'text-green-700' : 'text-red-700'
-                    }`}>
-                      {webhookResponse.status === 'sent' ? '✅ Request Sent' : '❌ Request Failed'}
-                    </span>
-                  </div>
-                  <p className={`text-sm ${
-                    webhookResponse.status === 'sent' ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {webhookResponse.message}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    {new Date(webhookResponse.timestamp).toLocaleString()}
-                  </p>
-                </div>
-
-                {/* Request Details - Collapsible */}
-                {webhookResponse.requestData && (
-                  <details className="space-y-2">
-                    <summary className="font-medium text-sm cursor-pointer hover:text-primary">
-                      View Request Details
-                    </summary>
-                    <div className="bg-muted p-3 rounded text-xs font-mono mt-2">
-                      <div><strong>Topic:</strong> {webhookResponse.requestData.campaignTopic}</div>
-                      <div><strong>Duration:</strong> {webhookResponse.requestData.durationWeeks} weeks</div>
-                      <div><strong>Tone:</strong> {webhookResponse.requestData.preferredTone}</div>
-                      <div><strong>Channels:</strong> {webhookResponse.requestData.targetChannels.join(', ')}</div>
-                      <div className="mt-2"><strong>Description:</strong></div>
-                      <div className="text-xs text-muted-foreground whitespace-pre-wrap">{webhookResponse.requestData.chatInput}</div>
-                    </div>
-                  </details>
-                )}
-
-                {webhookResponse.error && (
-                  <div className="bg-red-50 border border-red-200 p-3 rounded text-sm text-red-700">
-                    <strong>Error:</strong> {webhookResponse.error}
-                  </div>
-                )}
-              </div>
+            {campaignResults ? (
+              renderCampaignResults(campaignResults)
             ) : (
               <div className="space-y-4 text-sm">
                 <div>
@@ -557,4 +494,5 @@ const SmartCampaignPlanner = () => {
       </div>
     </div>;
 };
+
 export default SmartCampaignPlanner;
