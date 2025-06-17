@@ -129,13 +129,10 @@ const SmartCampaignPlanner = () => {
     // Format the campaign details into a descriptive string
     const campaignDescription = `Plan a ${formData.duration}-week ${formData.tone} social media campaign for "${formData.topic}" on ${formData.channels.join(', ')} with ${formData.mode} mode${formData.mode === 'autonomous' && formData.startDate ? ` starting ${format(formData.startDate, 'PPP')}` : ''}${formData.dailyIteration ? ' with daily AI iteration enabled' : ''}${formData.notifications.length > 0 ? ` and ${formData.notifications.join(' & ')} notifications` : ''}`;
     
+    // Restore the original request format that was working
     const requestData = {
       chatInput: campaignDescription,
-      sessionId: "lovable-demo-user-001",
-      campaignTopic: formData.topic,
-      durationWeeks: formData.duration.toString(),
-      preferredTone: formData.tone,
-      targetChannels: formData.channels
+      sessionId: "lovable-demo-user-001"
     };
     
     console.log('Sending campaign data to webhook:', requestData);
