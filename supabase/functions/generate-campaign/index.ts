@@ -16,16 +16,24 @@ serve(async (req) => {
   try {
     const requestData = await req.json();
     
-    console.log('Proxying campaign request to N8N:', requestData);
+    console.log('Received campaign request:', requestData);
 
-    // Make the request to N8N webhook
+    // Make the request to N8N webhook with the correct format
     const webhookUrl = 'https://andrewoconnor.app.n8n.cloud/webhook/generate-campaign-plan';
+    const requestBody = {
+      body: JSON.stringify(requestData), // Stringify the request data
+      webhookUrl: webhookUrl,
+      executionMode: 'production'
+    };
+    
+    console.log('Sending to N8N with correct format:', requestBody);
+
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(requestData)
+      body: JSON.stringify(requestBody)
     });
 
     if (!response.ok) {
