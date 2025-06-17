@@ -139,33 +139,29 @@ const SmartCampaignPlanner = () => {
       targetChannels: formData.channels
     };
     
-    console.log('Sending campaign data to webhook:', requestData);
+    console.log('Sending campaign data to Supabase Edge Function:', requestData);
     try {
-      const webhookUrl = 'https://andrewoconnor.app.n8n.cloud/webhook/generate-campaign-plan';
-      const response = await fetch(webhookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestData)
+      // Use the Supabase Edge Function instead of direct webhook call
+      const { data, error } = await supabase.functions.invoke('generate-campaign', {
+        body: requestData
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw new Error(error.message || 'Failed to generate campaign');
       }
 
-      const responseData = await response.json();
-      console.log('Webhook response:', responseData);
+      console.log('Campaign generation response:', data);
       
       // Set the campaign results for display
-      setCampaignResults(responseData);
+      setCampaignResults(data);
 
       toast({
         title: "Campaign Generated! 🚀",
         description: "Your AI-powered campaign plan is ready!"
       });
     } catch (error) {
-      console.error('Error calling webhook:', error);
+      console.error('Error generating campaign:', error);
       toast({
         title: "Request Failed",
         description: "Unable to generate campaign. Please try again.",
