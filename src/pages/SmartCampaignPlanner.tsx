@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Loader2, Sparkles, CalendarIcon } from 'lucide-react';
+import { Loader2, Sparkles, CalendarIcon, CheckCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -22,6 +22,15 @@ interface CampaignFormData {
   startDate?: Date;
   dailyIteration: boolean;
   notifications: string[];
+}
+
+interface CampaignResult {
+  campaignTitle: string;
+  weeks: {
+    week: number;
+    theme: string;
+    contentIdeas: string[];
+  }[];
 }
 
 const SmartCampaignPlanner = () => {
@@ -139,7 +148,28 @@ const SmartCampaignPlanner = () => {
         status: 'sent',
         message: 'Campaign generation request sent successfully!',
         requestData: requestData,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        // Mock the campaign results structure for demonstration
+        campaignResults: [
+          {
+            output: JSON.stringify({
+              campaignTitle: "Wellbeing Boost Week",
+              weeks: [
+                {
+                  week: 1,
+                  theme: "Feel Good, Stay Happy",
+                  contentIdeas: [
+                    "Email 1: Warm welcome email introducing the importance of wellbeing with friendly tips to get started",
+                    "Email 2: Easy self-care ideas for busy days to keep your energy up", 
+                    "Email 3: Fun wellbeing challenge encouraging small daily acts of kindness",
+                    "Email 4: Personal stories from students and staff sharing their favorite wellbeing habits",
+                    "Email 5: Helpful resources roundup and encouragement to continue the wellbeing journey"
+                  ]
+                }
+              ]
+            })
+          }
+        ]
       });
 
       toast({
@@ -162,6 +192,50 @@ const SmartCampaignPlanner = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const renderCampaignResults = (results: any[]) => {
+    if (!results || results.length === 0) return null;
+
+    return results.map((result, index) => {
+      try {
+        const campaign: CampaignResult = JSON.parse(result.output);
+        
+        return (
+          <div key={index} className="space-y-4">
+            <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                <h3 className="font-bold text-green-800">{campaign.campaignTitle}</h3>
+              </div>
+            </div>
+            
+            {campaign.weeks.map((week) => (
+              <div key={week.week} className="border border-border rounded-lg p-4">
+                <h4 className="font-semibold text-lg mb-2 text-primary">
+                  Week {week.week}: {week.theme}
+                </h4>
+                <div className="space-y-2">
+                  {week.contentIdeas.map((idea, ideaIndex) => (
+                    <div key={ideaIndex} className="flex items-start gap-2 text-sm">
+                      <span className="text-muted-foreground mt-1">•</span>
+                      <span className="text-foreground">{idea}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      } catch (error) {
+        console.error('Error parsing campaign result:', error);
+        return (
+          <div key={index} className="bg-red-50 border border-red-200 p-3 rounded text-sm text-red-700">
+            <strong>Error parsing campaign result:</strong> {result.output}
+          </div>
+        );
+      }
+    });
   };
 
   const channels = [{
@@ -319,19 +393,27 @@ const SmartCampaignPlanner = () => {
           </CardContent>
         </Card>
 
-        {/* Results Panel - Updated to show webhook response */}
+        {/* Results Panel - Updated to show webhook response and campaign results */}
         <Card className="border border-border shadow-sm">
           <CardHeader className="pb-3 lg:pb-6">
             <CardTitle className="text-base lg:text-lg">
-              {webhookResponse ? '🚀 Campaign Request Status' : '🎯 Campaign Strategy Preview'}
+              {webhookResponse ? '🚀 Campaign Results' : '🎯 Campaign Strategy Preview'}
             </CardTitle>
             <CardDescription className="text-sm">
-              {webhookResponse ? 'Results from your campaign generation request' : 'Live preview of your AI campaign configuration'}
+              {webhookResponse ? 'Your AI-generated campaign plan' : 'Live preview of your AI campaign configuration'}
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-0">
             {webhookResponse ? (
               <div className="space-y-4">
+                {/* Campaign Results */}
+                {webhookResponse.campaignResults && (
+                  <div className="space-y-4">
+                    {renderCampaignResults(webhookResponse.campaignResults)}
+                  </div>
+                )}
+
+                {/* Request Status */}
                 <div className={`p-4 rounded-lg border ${
                   webhookResponse.status === 'sent' 
                     ? 'bg-green-50 border-green-200' 
@@ -354,10 +436,13 @@ const SmartCampaignPlanner = () => {
                   </p>
                 </div>
 
+                {/* Request Details - Collapsible */}
                 {webhookResponse.requestData && (
-                  <div className="space-y-2">
-                    <h4 className="font-medium text-sm">Request Details:</h4>
-                    <div className="bg-muted p-3 rounded text-xs font-mono">
+                  <details className="space-y-2">
+                    <summary className="font-medium text-sm cursor-pointer hover:text-primary">
+                      View Request Details
+                    </summary>
+                    <div className="bg-muted p-3 rounded text-xs font-mono mt-2">
                       <div><strong>Topic:</strong> {webhookResponse.requestData.campaignTopic}</div>
                       <div><strong>Duration:</strong> {webhookResponse.requestData.durationWeeks} weeks</div>
                       <div><strong>Tone:</strong> {webhookResponse.requestData.preferredTone}</div>
@@ -365,7 +450,7 @@ const SmartCampaignPlanner = () => {
                       <div className="mt-2"><strong>Description:</strong></div>
                       <div className="text-xs text-muted-foreground whitespace-pre-wrap">{webhookResponse.requestData.chatInput}</div>
                     </div>
-                  </div>
+                  </details>
                 )}
 
                 {webhookResponse.error && (
