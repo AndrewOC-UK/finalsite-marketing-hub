@@ -29,8 +29,16 @@ interface CampaignResult {
   weeks: {
     week: number;
     theme: string;
-    contentIdeas: string[];
+    contentIdeas: {
+      [channel: string]: string[];
+    };
   }[];
+}
+
+// New interface for the webhook response format
+interface WebhookCampaignResult {
+  campaignTitle: string;
+  weeks: string; // This is a stringified JSON array
 }
 
 const SmartCampaignPlanner = () => {
@@ -152,13 +160,13 @@ const SmartCampaignPlanner = () => {
         // Mock the campaign results structure for demonstration
         campaignResults: [
           {
-            output: JSON.stringify({
-              campaignTitle: "Wellbeing Boost Week",
-              weeks: [
-                {
-                  week: 1,
-                  theme: "Feel Good, Stay Happy",
-                  contentIdeas: [
+            campaignTitle: "Wellbeing Boost Week",
+            weeks: JSON.stringify([
+              {
+                week: 1,
+                theme: "Feel Good, Stay Happy",
+                contentIdeas: {
+                  email: [
                     "Email 1: Warm welcome email introducing the importance of wellbeing with friendly tips to get started",
                     "Email 2: Easy self-care ideas for busy days to keep your energy up", 
                     "Email 3: Fun wellbeing challenge encouraging small daily acts of kindness",
@@ -166,8 +174,8 @@ const SmartCampaignPlanner = () => {
                     "Email 5: Helpful resources roundup and encouragement to continue the wellbeing journey"
                   ]
                 }
-              ]
-            })
+              }
+            ])
           }
         ]
       });
@@ -194,19 +202,25 @@ const SmartCampaignPlanner = () => {
     }
   };
 
-  const renderCampaignResults = (results: any[]) => {
+  const renderCampaignResults = (results: WebhookCampaignResult[]) => {
     if (!results || results.length === 0) return null;
 
     return results.map((result, index) => {
       try {
         // Log the raw result for debugging
         console.log('Raw campaign result:', result);
-        console.log('Result output:', result.output);
+        console.log('Campaign title:', result.campaignTitle);
+        console.log('Weeks string:', result.weeks);
         
-        const campaign: CampaignResult = JSON.parse(result.output);
-        console.log('Parsed campaign:', campaign);
-        console.log('Campaign weeks:', campaign.weeks);
-        console.log('Number of weeks:', campaign.weeks?.length);
+        // Parse the weeks string into an array
+        const weeksArray = JSON.parse(result.weeks);
+        console.log('Parsed weeks array:', weeksArray);
+        console.log('Number of weeks:', weeksArray?.length);
+        
+        const campaign: CampaignResult = {
+          campaignTitle: result.campaignTitle,
+          weeks: weeksArray
+        };
         
         return (
           <div key={index} className="space-y-4">
@@ -226,11 +240,18 @@ const SmartCampaignPlanner = () => {
                       <h4 className="font-semibold text-lg mb-2 text-primary">
                         Week {week.week}: {week.theme}
                       </h4>
-                      <div className="space-y-2">
-                        {week.contentIdeas && week.contentIdeas.map((idea, ideaIndex) => (
-                          <div key={ideaIndex} className="flex items-start gap-2 text-sm">
-                            <span className="text-muted-foreground mt-1">•</span>
-                            <span className="text-foreground">{idea}</span>
+                      <div className="space-y-3">
+                        {week.contentIdeas && Object.entries(week.contentIdeas).map(([channel, ideas]) => (
+                          <div key={channel} className="space-y-2">
+                            <h5 className="font-medium text-sm text-primary capitalize">{channel}:</h5>
+                            <div className="ml-4 space-y-1">
+                              {Array.isArray(ideas) && ideas.map((idea, ideaIndex) => (
+                                <div key={ideaIndex} className="flex items-start gap-2 text-sm">
+                                  <span className="text-muted-foreground mt-1">•</span>
+                                  <span className="text-foreground">{idea}</span>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -248,7 +269,12 @@ const SmartCampaignPlanner = () => {
         console.error('Raw result that failed to parse:', result);
         return (
           <div key={index} className="bg-red-50 border border-red-200 p-3 rounded text-sm text-red-700">
-            <strong>Error parsing campaign result:</strong> {result.output}
+            <strong>Error parsing campaign result:</strong>
+            <div className="mt-2">
+              <div><strong>Campaign Title:</strong> {result.campaignTitle}</div>
+              <div><strong>Weeks Data:</strong> {result.weeks}</div>
+              <div><strong>Error:</strong> {error.message}</div>
+            </div>
           </div>
         );
       }
