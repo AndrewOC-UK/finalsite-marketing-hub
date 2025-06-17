@@ -129,10 +129,13 @@ const SmartCampaignPlanner = () => {
     // Format the campaign details into a descriptive string
     const campaignDescription = `Plan a ${formData.duration}-week ${formData.tone} social media campaign for "${formData.topic}" on ${formData.channels.join(', ')} with ${formData.mode} mode${formData.mode === 'autonomous' && formData.startDate ? ` starting ${format(formData.startDate, 'PPP')}` : ''}${formData.dailyIteration ? ' with daily AI iteration enabled' : ''}${formData.notifications.length > 0 ? ` and ${formData.notifications.join(' & ')} notifications` : ''}`;
     
-    // Restore the original request format that was working
     const requestData = {
       chatInput: campaignDescription,
-      sessionId: "lovable-demo-user-001"
+      sessionId: "lovable-demo-user-001",
+      campaignTopic: formData.topic,
+      durationWeeks: formData.duration.toString(),
+      preferredTone: formData.tone,
+      targetChannels: formData.channels
     };
     
     console.log('Sending campaign data to webhook:', requestData);
@@ -143,62 +146,34 @@ const SmartCampaignPlanner = () => {
         headers: {
           'Content-Type': 'application/json'
         },
+        mode: 'no-cors',
         body: JSON.stringify(requestData)
       });
 
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
-      
-      // Get the raw response text first
-      const responseText = await response.text();
-      console.log('Raw response text:', responseText);
-      
-      if (response.ok) {
-        // Try to parse the response as JSON
-        let responseData;
-        try {
-          responseData = JSON.parse(responseText);
-          console.log('Parsed response data:', responseData);
-        } catch (parseError) {
-          console.error('JSON parse error:', parseError);
-          throw new Error(`Invalid JSON response: ${responseText.substring(0, 200)}...`);
-        }
-        
-        // Handle the new N8N response format
-        let campaignResults = [];
-        if (Array.isArray(responseData) && responseData.length > 0) {
-          campaignResults = responseData;
-        } else if (responseData.campaignTitle && responseData.weeks) {
-          // Handle single object response
-          campaignResults = [responseData];
-        }
+      // Since we're using no-cors mode, we can't read the response
+      // But we can show a success message and indicate the webhook was called
+      setWebhookResponse({
+        status: 'sent',
+        message: 'Campaign generation request sent successfully!',
+        requestData: requestData,
+        timestamp: new Date().toISOString()
+      });
 
-        setWebhookResponse({
-          status: 'success',
-          message: 'Campaign generated successfully!',
-          requestData: requestData,
-          campaignResults: campaignResults,
-          timestamp: new Date().toISOString()
-        });
-
-        toast({
-          title: "Campaign Generated! 🎉",
-          description: "Your AI campaign plan is ready!"
-        });
-      } else {
-        throw new Error(`HTTP ${response.status}: ${response.statusText} - ${responseText}`);
-      }
+      toast({
+        title: "Campaign Request Sent! 🚀",
+        description: "Your campaign generation request has been submitted to the AI system."
+      });
     } catch (error) {
-      console.error('Error calling webhook:', error);
+      console.error('Error sending campaign request:', error);
       setWebhookResponse({
         status: 'error',
-        message: 'Failed to generate campaign',
+        message: 'Failed to send campaign generation request',
         error: error.message,
         timestamp: new Date().toISOString()
       });
       toast({
-        title: "Generation Failed",
-        description: "Unable to generate campaign. Please try again.",
+        title: "Request Failed",
+        description: "Unable to send campaign generation request. Please try again.",
         variant: "destructive"
       });
     } finally {
