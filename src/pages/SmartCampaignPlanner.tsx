@@ -146,34 +146,48 @@ const SmartCampaignPlanner = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        mode: 'no-cors',
         body: JSON.stringify(requestData)
       });
 
-      // Since we're using no-cors mode, we can't read the response
-      // But we can show a success message and indicate the webhook was called
-      setWebhookResponse({
-        status: 'sent',
-        message: 'Campaign generation request sent successfully!',
-        requestData: requestData,
-        timestamp: new Date().toISOString()
-      });
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log('Webhook response received:', responseData);
+        
+        // Handle the new N8N response format
+        let campaignResults = [];
+        if (Array.isArray(responseData) && responseData.length > 0) {
+          campaignResults = responseData;
+        } else if (responseData.campaignTitle && responseData.weeks) {
+          // Handle single object response
+          campaignResults = [responseData];
+        }
 
-      toast({
-        title: "Campaign Request Sent! 🚀",
-        description: "Your campaign generation request has been submitted to the AI system."
-      });
+        setWebhookResponse({
+          status: 'success',
+          message: 'Campaign generated successfully!',
+          requestData: requestData,
+          campaignResults: campaignResults,
+          timestamp: new Date().toISOString()
+        });
+
+        toast({
+          title: "Campaign Generated! 🎉",
+          description: "Your AI campaign plan is ready!"
+        });
+      } else {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
     } catch (error) {
-      console.error('Error sending campaign request:', error);
+      console.error('Error calling webhook:', error);
       setWebhookResponse({
         status: 'error',
-        message: 'Failed to send campaign generation request',
+        message: 'Failed to generate campaign',
         error: error.message,
         timestamp: new Date().toISOString()
       });
       toast({
-        title: "Request Failed",
-        description: "Unable to send campaign generation request. Please try again.",
+        title: "Generation Failed",
+        description: "Unable to generate campaign. Please try again.",
         variant: "destructive"
       });
     } finally {
