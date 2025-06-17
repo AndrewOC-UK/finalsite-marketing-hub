@@ -156,28 +156,7 @@ const SmartCampaignPlanner = () => {
         status: 'sent',
         message: 'Campaign generation request sent successfully!',
         requestData: requestData,
-        timestamp: new Date().toISOString(),
-        // Mock the campaign results structure for demonstration
-        campaignResults: [
-          {
-            campaignTitle: "Wellbeing Boost Week",
-            weeks: JSON.stringify([
-              {
-                week: 1,
-                theme: "Feel Good, Stay Happy",
-                contentIdeas: {
-                  email: [
-                    "Email 1: Warm welcome email introducing the importance of wellbeing with friendly tips to get started",
-                    "Email 2: Easy self-care ideas for busy days to keep your energy up", 
-                    "Email 3: Fun wellbeing challenge encouraging small daily acts of kindness",
-                    "Email 4: Personal stories from students and staff sharing their favorite wellbeing habits",
-                    "Email 5: Helpful resources roundup and encouragement to continue the wellbeing journey"
-                  ]
-                }
-              }
-            ])
-          }
-        ]
+        timestamp: new Date().toISOString()
       });
 
       toast({
