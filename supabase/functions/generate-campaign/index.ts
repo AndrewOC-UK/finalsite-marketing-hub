@@ -29,6 +29,9 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
+      console.error(`N8N webhook error! status: ${response.status}`);
+      const errorText = await response.text();
+      console.error('N8N error response:', errorText);
       throw new Error(`N8N webhook error! status: ${response.status}`);
     }
 
