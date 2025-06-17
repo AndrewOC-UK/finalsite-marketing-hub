@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
 import { Settings as SettingsIcon, Webhook, User } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { toast } from '@/hooks/use-toast'
@@ -112,51 +111,6 @@ const Settings = () => {
               />
               <p className="text-xs text-muted-foreground">
                 This webhook will be triggered when generating new AI campaign plans
-              </p>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <Label htmlFor="content-webhook">Content Generation Webhook</Label>
-              <Input
-                id="content-webhook"
-                placeholder="https://your-n8n-instance.com/webhook/content-generation"
-                value={webhooks.contentGeneration}
-                onChange={(e) => setWebhooks({ ...webhooks, contentGeneration: e.target.value })}
-              />
-              <p className="text-xs text-muted-foreground">
-                This webhook will be triggered when generating new social media content
-              </p>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <Label htmlFor="insight-webhook">Insight Report Webhook</Label>
-              <Input
-                id="insight-webhook"
-                placeholder="https://your-n8n-instance.com/webhook/insight-report"
-                value={webhooks.insightReport}
-                onChange={(e) => setWebhooks({ ...webhooks, insightReport: e.target.value })}
-              />
-              <p className="text-xs text-muted-foreground">
-                This webhook will be used for generating and delivering insight reports
-              </p>
-            </div>
-
-            <Separator />
-
-            <div className="space-y-2">
-              <Label htmlFor="outreach-webhook">Email Outreach Webhook</Label>
-              <Input
-                id="outreach-webhook"
-                placeholder="https://your-n8n-instance.com/webhook/email-outreach"
-                value={webhooks.emailOutreach}
-                onChange={(e) => setWebhooks({ ...webhooks, emailOutreach: e.target.value })}
-              />
-              <p className="text-xs text-muted-foreground">
-                This webhook will handle automated email outreach campaigns
               </p>
             </div>
           </div>
