@@ -18,17 +18,17 @@ serve(async (req) => {
     
     console.log('Received campaign request:', requestData);
 
-    // Make the request to N8N webhook directly with the request data
+    // Make the request to N8N webhook with the correct format that matches working version
     const webhookUrl = 'https://andrewoconnor.app.n8n.cloud/webhook/generate-campaign-plan';
     
-    console.log('Sending request data directly to N8N:', requestData);
+    console.log('Sending request data as direct stringified body to N8N:', requestData);
 
     const response = await fetch(webhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(requestData) // Send the request data directly
+      body: JSON.stringify(requestData) // Send the request data directly as stringified JSON
     });
 
     if (!response.ok) {
