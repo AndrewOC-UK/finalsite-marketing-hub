@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -126,12 +127,18 @@ const SmartCampaignPlanner = () => {
     setIsLoading(true);
     setCampaignResults([]);
     
-    // Format the campaign details into a descriptive string
-    const campaignDescription = `Plan a ${formData.duration}-week ${formData.tone} social media campaign for "${formData.topic}" on ${formData.channels.join(', ')} with ${formData.mode} mode${formData.mode === 'autonomous' && formData.startDate ? ` starting ${format(formData.startDate, 'PPP')}` : ''}${formData.dailyIteration ? ' with daily AI iteration enabled' : ''}${formData.notifications.length > 0 ? ` and ${formData.notifications.join(' & ')} notifications` : ''}`;
-    
+    // Send the detailed campaign parameters that N8N expects
     const requestData = {
-      chatInput: campaignDescription,
-      sessionId: "lovable-demo-user-001"
+      sessionId: "lovable-demo-user-001",
+      campaignTopic: formData.topic,
+      durationWeeks: formData.duration,
+      preferredTone: formData.tone,
+      targetChannels: formData.channels,
+      campaignMode: formData.mode,
+      startDate: formData.startDate ? format(formData.startDate, 'yyyy-MM-dd') : null,
+      dailyIteration: formData.dailyIteration,
+      notifications: formData.notifications,
+      chatInput: `Plan a ${formData.duration}-week ${formData.tone} social media campaign for "${formData.topic}" on ${formData.channels.join(', ')} with ${formData.mode} mode${formData.mode === 'autonomous' && formData.startDate ? ` starting ${format(formData.startDate, 'PPP')}` : ''}${formData.dailyIteration ? ' with daily AI iteration enabled' : ''}${formData.notifications.length > 0 ? ` and ${formData.notifications.join(' & ')} notifications` : ''}`
     };
     
     console.log('Sending campaign data to webhook:', requestData);
@@ -142,7 +149,7 @@ const SmartCampaignPlanner = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        mode: 'no-cors', // Restore no-cors mode for N8N compatibility
+        mode: 'no-cors', // Keep no-cors mode for N8N compatibility
         body: JSON.stringify(requestData)
       });
 
