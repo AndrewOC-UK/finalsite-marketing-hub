@@ -12,6 +12,7 @@ import { Loader2, Sparkles, CalendarIcon, CheckCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CampaignFormData {
   topic: string;
